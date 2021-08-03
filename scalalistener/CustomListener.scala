@@ -208,7 +208,8 @@ class JupyterSparkMonitorListener(conf: SparkConf) extends SparkListener {
       ("appId" -> appId) ~
       ("numExecutors" -> numExecutors) ~
       ("name" -> name)
-    logger.info("JobStart: \n" + pretty(render(json)))
+    logger.info("Job Start: " + jobStart.jobId)
+    logger.debug(pretty(render(json)))
     send(pretty(render(json)))
   }
 
@@ -258,6 +259,9 @@ class JupyterSparkMonitorListener(conf: SparkConf) extends SparkListener {
       ("status" -> status) ~
       ("completionTime" -> jobData.completionTime)
 
+    logger.info("Job End: " + jobEnd.jobId)
+    logger.debug(pretty(render(json)))
+
     send(pretty(render(json)))
   }
 
@@ -306,7 +310,8 @@ class JupyterSparkMonitorListener(conf: SparkConf) extends SparkListener {
       ("numTasks" -> stage.numTasks) ~
       ("status" -> status)
 
-    logger.info("Stage Completed: \n" + pretty(render(json)))
+    logger.info("Stage Completed: " + stage.stageId)
+    logger.debug(pretty(render(json)))
     send(pretty(render(json)))
   }
 
@@ -342,7 +347,8 @@ class JupyterSparkMonitorListener(conf: SparkConf) extends SparkListener {
       ("parentIds" -> stage.parentIds) ~
       ("submissionTime" -> submissionTime) ~
       ("jobIds" -> jobIds)
-    logger.info("Stage Submitted: \n" + pretty(render(json)))
+    logger.info("Stage Submitted: " + stage.stageId)
+    logger.debug(pretty(render(json)))
     send(pretty(render(json)))
   }
 
@@ -516,7 +522,6 @@ class JupyterSparkMonitorListener(conf: SparkConf) extends SparkListener {
       ("errorMessage" -> errorMessage) ~
       ("metrics" -> jsonMetrics)
 
-    logger.info("Task Ended: \n" + pretty(render(json)))
     send(pretty(render(json)))
   }
 
@@ -572,7 +577,8 @@ class JupyterSparkMonitorListener(conf: SparkConf) extends SparkListener {
       ("numCores" -> executorAdded.executorInfo.totalCores) ~
       ("totalCores" -> totalCores) // Sending this as browser data can be lost during reloads
 
-    logger.info("Executor Added: \n" + pretty(render(json)))
+    logger.info("Executor Added: " + executorAdded.executorId)
+    logger.debug(pretty(render(json)))
     send(pretty(render(json)))
   }
 
@@ -584,8 +590,9 @@ class JupyterSparkMonitorListener(conf: SparkConf) extends SparkListener {
       ("executorId" -> executorRemoved.executorId) ~
       ("time" -> executorRemoved.time) ~
       ("totalCores" -> totalCores) // Sending this as browser data can be lost during reloads
-
-    logger.info("Executor Removed: \n" + pretty(render(json)))
+    
+    logger.info("Executor Removed: " + executorRemoved.executorId)
+    logger.debug(pretty(render(json)))
     send(pretty(render(json)))
   }
 }
