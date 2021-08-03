@@ -14,6 +14,7 @@ import scala.collection.mutable
 import scala.collection.mutable.{ HashMap, HashSet, LinkedHashMap, ListBuffer }
 import java.net._
 import java.io._
+import org.apache.log4j.Logger
 
 /**
  * A SparkListener Implementation that forwards data to a Jupyter Kernel
@@ -24,15 +25,16 @@ import java.io._
  *  - Overrides methods that correspond to events in a spark Application.
  *  - The argument for each overrided method contains the received data for that event. (See SparkListener docs for more information.)
  *  - For each application, job, stage, and task there is a 'start' and an 'end' event. For executors, there are 'added' and 'removed' events
- *
+ * 
  *  @constructor called by Spark internally
  *  @param conf Spark configuration object used to start the spark application.
  */
 class JupyterSparkMonitorListener(conf: SparkConf) extends SparkListener {
 
-  println("SPARKMONITOR_LISTENER: Started SparkListener for Jupyter Notebook")
+  val logger = Logger.getLogger(this.getClass.getName)
+  logger.info("Started SparkListener for Jupyter Notebook")
   val port = scala.util.Properties.envOrElse("SPARKMONITOR_KERNEL_PORT", "ERRORNOTFOUND")
-  println("SPARKMONITOR_LISTENER: Port obtained from environment: " + port)
+  logger.info("Port obtained from environment: " + port)
   var socket: Socket = null
   var out: OutputStreamWriter = null
   // Open the socket to the kernel. The kernel is the server already waiting for connections.
@@ -40,24 +42,22 @@ class JupyterSparkMonitorListener(conf: SparkConf) extends SparkListener {
     socket = new Socket("localhost", port.toInt)
     out = new OutputStreamWriter(socket.getOutputStream())
   } catch {
-    case exception: Throwable => println("\nSPARKMONITOR_LISTENER: Exception creating socket:" + exception + "\n")
+    case exception: Throwable => logger.error("Exception creating socket: ", exception)
   }
 
   /** Send a string message to the kernel using the open socket.*/
   def send(msg: String): Unit = {
     try {
-      //println("\nSPARKMONITOR_LISTENER: --------------Sending Message:------------------\n"+msg+
-      //	"\nSPARKMONITOR_LISTENER: -------------------------------------------------\n") // Uncomment to see all events
       out.write(msg + ";EOD:")
       out.flush()
     } catch {
-      case exception: Throwable => println("\nSPARKMONITOR_LISTENER: Exception sending socket message:" + exception + "\n")
+      case exception: Throwable => logger.error("Exception sending socket message: ", exception)
     }
   }
 
   /** Close the socket connection to the kernel.*/
   def closeConnection(): Unit = {
-    println("SPARKMONITOR_LISTENER: Closing Connection")
+    logger.info("Closing Connection")
     out.close()
     socket.close()
   }
@@ -112,7 +112,7 @@ class JupyterSparkMonitorListener(conf: SparkConf) extends SparkListener {
   override def onApplicationStart(appStarted: SparkListenerApplicationStart): Unit = {
     startTime = appStarted.time
     appId = appStarted.appId.getOrElse("null")
-    println("SPARKMONITOR_LISTENER: Application Started: " + appId + " ...Start Time: " + appStarted.time)
+    logger.info("Application Started: " + appId + "  ...Start Time: " + appStarted.time)
     val json = ("msgtype" -> "sparkApplicationStart") ~
       ("startTime" -> startTime) ~
       ("appId" -> appId) ~
@@ -129,7 +129,7 @@ class JupyterSparkMonitorListener(conf: SparkConf) extends SparkListener {
    * Closes the socket connection to the kernel.
    */
   override def onApplicationEnd(appEnded: SparkListenerApplicationEnd): Unit = {
-    println("SPARKMONITOR_LISTENER: Application ending...End Time: " + appEnded.time)
+    logger.info("Application ending...End Time: " + appEnded.time)
     endTime = appEnded.time
     val json = ("msgtype" -> "sparkApplicationEnd") ~
       ("endTime" -> endTime)
@@ -195,7 +195,7 @@ class JupyterSparkMonitorListener(conf: SparkConf) extends SparkListener {
       stageIdToData.getOrElseUpdate((stageInfo.stageId, stageInfo.attemptId), new StageUIData)
     }
     val name = jobStart.properties.getProperty("callSite.short", "null")
-    // println("Num Executors" + numExecutors.toInt)
+    logger.info("Num Executors " + numExecutors.toInt)
     val json = ("msgtype" -> "sparkJobStart") ~
       ("jobGroup" -> jobGroup.getOrElse("null")) ~
       ("jobId" -> jobStart.jobId) ~
@@ -208,14 +208,14 @@ class JupyterSparkMonitorListener(conf: SparkConf) extends SparkListener {
       ("appId" -> appId) ~
       ("numExecutors" -> numExecutors) ~
       ("name" -> name)
-    // println("SPARKMONITOR_LISTENER: JobStart: \n" + pretty(render(json)) + "\n")
+    logger.info("JobStart: \n" + pretty(render(json)))
     send(pretty(render(json)))
   }
 
   /** Called when a job ends. */
   override def onJobEnd(jobEnd: SparkListenerJobEnd): Unit = synchronized {
     val jobData = activeJobs.remove(jobEnd.jobId).getOrElse {
-      println("SPARKMONITOR_LISTENER: Job completed for unknown job: " + jobEnd.jobId)
+      logger.info("Job completed for unknown job: " + jobEnd.jobId)
       new JobUIData(jobId = jobEnd.jobId)
     }
     jobData.completionTime = Option(jobEnd.time).filter(_ >= 0)
@@ -266,7 +266,7 @@ class JupyterSparkMonitorListener(conf: SparkConf) extends SparkListener {
     val stage = stageCompleted.stageInfo
     stageIdToInfo(stage.stageId) = stage
     val stageData = stageIdToData.getOrElseUpdate((stage.stageId, stage.attemptId), {
-      println("SPARKMONITOR_LISTENER: Stage completed for unknown stage " + stage.stageId)
+      logger.info("Stage completed for unknown stage " + stage.stageId)
       new StageUIData
     })
     var status = "UNKNOWN"
@@ -306,7 +306,7 @@ class JupyterSparkMonitorListener(conf: SparkConf) extends SparkListener {
       ("numTasks" -> stage.numTasks) ~
       ("status" -> status)
 
-    // println("SPARKMONITOR_LISTENER: Stage Completed: \n" + pretty(render(json)) + "\n")
+    logger.info("Stage Completed: \n" + pretty(render(json)))
     send(pretty(render(json)))
   }
 
@@ -342,7 +342,7 @@ class JupyterSparkMonitorListener(conf: SparkConf) extends SparkListener {
       ("parentIds" -> stage.parentIds) ~
       ("submissionTime" -> submissionTime) ~
       ("jobIds" -> jobIds)
-    // println("SPARKMONITOR_LISTENER Stage Submitted: \n" + pretty(render(json)) + "\n")
+    logger.info("Stage Submitted: \n" + pretty(render(json)))
     send(pretty(render(json)))
   }
 
@@ -351,7 +351,7 @@ class JupyterSparkMonitorListener(conf: SparkConf) extends SparkListener {
     val taskInfo = taskStart.taskInfo
     if (taskInfo != null) {
       val stageData = stageIdToData.getOrElseUpdate((taskStart.stageId, taskStart.stageAttemptId), {
-        println("SPARKMONITOR_LISTENER: Task start for unknown stage " + taskStart.stageId)
+        logger.info("Task start for unknown stage " + taskStart.stageId)
         new StageUIData
       })
       stageData.numActiveTasks += 1
@@ -387,7 +387,6 @@ class JupyterSparkMonitorListener(conf: SparkConf) extends SparkListener {
       ("status" -> taskInfo.status) ~
       ("speculative" -> taskInfo.speculative)
 
-    //println("SPARKMONITOR_LISTENER: Task Started: \n"+ pretty(render(json)) + "\n")
     send(pretty(render(json)))
   }
 
@@ -400,7 +399,7 @@ class JupyterSparkMonitorListener(conf: SparkConf) extends SparkListener {
     var errorMessage: Option[String] = None
     if (info != null && taskEnd.stageAttemptId != -1) {
       val stageData = stageIdToData.getOrElseUpdate((taskEnd.stageId, taskEnd.stageAttemptId), {
-        println("SPARKMONITOR_LISTENER: Task end for unknown stage " + taskEnd.stageId)
+        logger.info("Task end for unknown stage " + taskEnd.stageId)
         new StageUIData
       })
       stageData.numActiveTasks -= 1
@@ -517,7 +516,7 @@ class JupyterSparkMonitorListener(conf: SparkConf) extends SparkListener {
       ("errorMessage" -> errorMessage) ~
       ("metrics" -> jsonMetrics)
 
-    // println("SPARKMONITOR_LISTENER: Task Ended: \n" + pretty(render(json)) + "\n")
+    logger.info("Task Ended: \n" + pretty(render(json)))
     send(pretty(render(json)))
   }
 
@@ -573,7 +572,7 @@ class JupyterSparkMonitorListener(conf: SparkConf) extends SparkListener {
       ("numCores" -> executorAdded.executorInfo.totalCores) ~
       ("totalCores" -> totalCores) // Sending this as browser data can be lost during reloads
 
-    // println("SPARKMONITOR_LISTENER: Executor Added: \n" + pretty(render(json)) + "\n")
+    logger.info("Executor Added: \n" + pretty(render(json)))
     send(pretty(render(json)))
   }
 
@@ -586,7 +585,7 @@ class JupyterSparkMonitorListener(conf: SparkConf) extends SparkListener {
       ("time" -> executorRemoved.time) ~
       ("totalCores" -> totalCores) // Sending this as browser data can be lost during reloads
 
-    // println("SPARKMONITOR_LISTENER: Executor Removed: \n" + pretty(render(json)) + "\n")
+    logger.info("Executor Removed: \n" + pretty(render(json)))
     send(pretty(render(json)))
   }
 }
