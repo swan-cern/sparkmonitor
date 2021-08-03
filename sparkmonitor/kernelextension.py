@@ -183,7 +183,10 @@ def load_ipython_extension(ipython):
         else:
             conf = SparkConf()  # Create a new conf
             configure(conf)
-            ipython.push({'conf': conf})  # Add to users namespace
+            ipython.push({
+                'conf': conf, 
+                'swan_spark_conf': conf # For backward compatibility with fork
+                })  # Add to users namespace
 
 
 def unload_ipython_extension(ipython):

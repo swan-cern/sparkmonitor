@@ -227,7 +227,7 @@ class JupyterSparkMonitorListener(conf: SparkConf) extends SparkListener {
         completedJobs += jobData
         trimJobsIfNecessary(completedJobs)
         jobData.status = JobExecutionStatus.SUCCEEDED
-        status = "SUCCEEDED"
+        status = "COMPLETED"
         numCompletedJobs += 1
       case _ =>
         failedJobs += jobData
