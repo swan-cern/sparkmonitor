@@ -1,0 +1,5 @@
+/* Jupyter Lab Specic CSS */
+
+.SparkMonitorCellWidget {
+    margin-left: calc(var(--jp-cell-collapser-width) + var(--jp-cell-prompt-width));
+}
