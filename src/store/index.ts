@@ -1,6 +1,7 @@
-import { makeAutoObservable } from 'mobx';
-import { TaskChartStore } from './task-chart-store';
 import React from 'react';
+import { makeAutoObservable } from 'mobx';
+
+import { TaskChartStore } from './task-chart-store';
 
 class SparkJob {
     uniqueId!: string;
@@ -82,10 +83,10 @@ class Cell {
     isRemoved = false;
     // status: 'executing' | 'executed' | 'removed' | 're-executed';
     jobIds: Array<string> = [];
-    taskChartStore = new TaskChartStore(this.notebookStore);
-
+    taskChartStore: TaskChartStore;
     constructor(public cellId: string, private notebookStore: NotebookStore) {
         makeAutoObservable(this);
+        this.taskChartStore = new TaskChartStore(this.notebookStore);
     }
 
     toggleCollapseCellDisplay() {

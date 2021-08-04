@@ -7,9 +7,9 @@
 import { INotebookTracker, NotebookTracker } from '@jupyterlab/notebook';
 import { IMainMenu, MainMenu } from '@jupyterlab/mainmenu';
 import { Menu } from '@lumino/widgets';
-import SparkMonitor from './lab/jupyterlab-sparkmonitor';
+import SparkMonitor from './jupyterlab-sparkmonitor';
 import { JupyterFrontEnd } from '@jupyterlab/application';
-import { NotebookStore, store } from './store';
+import { NotebookStore, store } from '../store';
 
 /** Entrypoint: Called when the extension is loaded by jupyter. */
 const extension = {

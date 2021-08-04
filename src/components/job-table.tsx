@@ -5,7 +5,6 @@ import ReactTimeAgo from 'react-timeago';
 import { useCellStore, useNotebookStore } from '../store';
 import { ProgressBar } from './progress-bar';
 import prettyMilliseconds from 'pretty-ms';
-import '../../style/jobtable.css';
 import { ErrorBoundary } from './error-boundary';
 
 const StageItem = observer((props: { stageId: string }) => {
@@ -46,12 +45,14 @@ const StageTable = observer((props: { jobId: string }) => {
     return (
         <table className="stagetable">
             <thead>
-                <th className="thstageid">ID</th>
-                <th className="thstagename">Stage</th>
-                <th className="thstagestatus">Status</th>
-                <th className="thstagetasks">Tasks</th>
-                <th className="thstagestart">Submission Time</th>
-                <th className="thstageduration">Duration</th>
+                <tr>
+                    <th className="thstageid">ID</th>
+                    <th className="thstagename">Stage</th>
+                    <th className="thstagestatus">Status</th>
+                    <th className="thstagetasks">Tasks</th>
+                    <th className="thstagestart">Submission Time</th>
+                    <th className="thstageduration">Duration</th>
+                </tr>
             </thead>
             <tbody>{rows}</tbody>
         </table>
