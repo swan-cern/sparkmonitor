@@ -20,7 +20,7 @@ def _jupyter_nbextension_paths():
         # directory in the `nbextension/` namespace
         dest='sparkmonitor',
         # _also_ in the `nbextension/` namespace
-        require='sparkmonitor/module')]
+        require='sparkmonitor/extension')]
 
 
 def _jupyter_server_extension_paths():

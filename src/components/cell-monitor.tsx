@@ -1,7 +1,6 @@
 import { observer } from 'mobx-react-lite';
 import React from 'react';
 
-import '../../style/styles.css';
 import { useCellStore, useNotebookStore } from '../store';
 import { CellMonitorHeader } from './header';
 import { JobTable } from './job-table';
@@ -14,8 +13,8 @@ export const CellMonitor = observer(() => {
     const cell = useCellStore();
 
     // If the cell has no spark job
-    if (!cell?.jobIds) {
-        return <div className="sparkMonitorCellRoot"></div>;
+    if (cell?.jobIds?.length <= 0) {
+        return <div className="sparkMonitorCellRoot" />;
     }
 
     if (notebook?.hideAllDisplays || cell.isRemoved) {

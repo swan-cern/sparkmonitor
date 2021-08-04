@@ -1,11 +1,13 @@
+import React from 'react';
 import { ICellModel } from '@jupyterlab/cells';
 import { NotebookPanel } from '@jupyterlab/notebook';
 import { IComm, IKernelConnection } from '@jupyterlab/services/lib/kernel/kernel';
 import { ICommMsgMsg } from '@jupyterlab/services/lib/kernel/messages';
 import { PanelLayout } from '@lumino/widgets';
 import CurrentCellTracker from './current-cell';
-import { createCellWidget } from './lab-cell-widget';
+import { CellWidget } from '../components';
 import { NotebookStore } from '../store';
+import { ReactWidget } from '@jupyterlab/apputils';
 
 export default class JupyterLabSparkMonitor {
     currentCellTracker: CurrentCellTracker;
@@ -47,9 +49,18 @@ export default class JupyterLabSparkMonitor {
                 const codeCell = this.notebookPanel.content.widgets.find((widget) => widget.model === cellModel);
                 if (codeCell && !codeCell.node.querySelector('.sparkMonitorCellRoot')) {
                     console.log('Creating cell', cellModel.id);
+
+                    const widget = ReactWidget.create(
+                        React.createElement(CellWidget, {
+                            notebookId: this.notebookPanel.id,
+                            cellId: cellModel.id,
+                        }),
+                    );
+                    widget.addClass('SparkMonitorCellWidget');
+
                     (codeCell.layout as PanelLayout).insertWidget(
                         2, // Insert the element below the input area based on position/index
-                        createCellWidget(cellModel.id, this.notebookPanel.id),
+                        widget,
                     );
                     codeCell.update();
                 }

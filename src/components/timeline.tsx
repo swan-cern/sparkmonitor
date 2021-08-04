@@ -6,7 +6,6 @@ import 'vis-timeline/styles/vis-timeline-graph2d.css';
 
 import { useCellStore, useNotebookStore } from '../store';
 import { ErrorBoundary } from './error-boundary';
-import '../../../style/timeline.css';
 
 const timelineOptions: TimelineOptions = {
     // rollingMode: {
@@ -74,8 +73,10 @@ export const Timeline = observer(() => {
     ]);
 
     React.useEffect(() => {
-        const timeline = new VisTimeline(timelineDiv.current!, timelineData, timelineGroups, timelineOptions);
-
+        if (!timelineDiv.current) {
+            return;
+        }
+        const timeline = new VisTimeline(timelineDiv.current, timelineData, timelineGroups, timelineOptions);
         const refreshInterval = setInterval(() => {
             //
         });
@@ -89,8 +90,6 @@ export const Timeline = observer(() => {
             <div className="timelinecontent tabcontent">
                 <div className="timelinewrapper hidephases">
                     <div ref={timelineDiv} className="timelinecontainer1"></div>
-                    {/* <div className="timelinecontainer2"></div> */}
-                    {/* <div className="timelinecontainer3"></div> */}
                 </div>
             </div>
         </ErrorBoundary>

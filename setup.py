@@ -7,21 +7,21 @@ from setuptools import find_packages, setup
 
 HERE = Path(__file__).parent.resolve()
 
-name = "jupyterlab_sparkmonitor"
+name = "sparkmonitor"
 
 lab_path = HERE / "sparkmonitor" / "labextension"
 
 ensured_targets = [str(lab_path / "package.json"), str(lab_path / "static/style.js")]
 
-labext_name = "jupyterlab-sparkmonitor"
+labext_name = "sparkmonitor"
 
 data_file_spec = [
-    (f"share/jupyter/labextensions/jupyterlab-sparkmonitor", str(lab_path), "**"),
-    (f"share/jupyter/labextensions/jupyterlab-sparkmonitor", str(HERE), "install.json"),
+    (f"share/jupyter/labextensions/sparkmonitor", str(lab_path), "**"),
+    (f"share/jupyter/labextensions/sparkmonitor", str(HERE), "install.json"),
     (
         "etc/jupyter/jupyter_server_config.d",
         "jupyter-config",
-        "jupyterlab_sparkmonitor.json",
+        "sparkmonitor.json",
     ),
 ]
 
