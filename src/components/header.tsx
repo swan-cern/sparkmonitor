@@ -7,13 +7,13 @@ export const CellMonitorHeader = observer(() => {
     const cell = useCellStore();
 
     const isButtonActive = (view: string) => (!cell.isCollapsed && cell.view === view ? 'tabbuttonactive' : '');
-    const jobButtonClassNames = 'jobtabletabbutton tabbutton ' + isButtonActive('jobs');
-    const tasksButtonClassNames = 'taskviewtabbutton tabbutton ' + isButtonActive('taskchart');
-    const timelineButtonClassNames = 'timelinetabbutton tabbutton ' + isButtonActive('timeline');
+    const jobButtonClassNames = 'jobtabletabbuttonicon tabbutton ' + isButtonActive('jobs');
+    const tasksButtonClassNames = 'taskviewtabbuttonicon tabbutton ' + isButtonActive('taskchart');
+    const timelineButtonClassNames = 'timelinetabbuttonicon tabbutton ' + isButtonActive('timeline');
 
     return (
         <div className="title">
-            <span className="titleleft">
+            <div className="titleleft">
                 <span
                     className="tbitem titlecollapse "
                     onClick={() => {
@@ -55,50 +55,40 @@ export const CellMonitorHeader = observer(() => {
                         )}
                     </span>
                 </span>
-            </span>
-            <span className="titleright">
-                <span className="tabbuttons">
+            </div>
+            <div className="titleright">
+                <div className="tabbuttons">
                     <span
                         className={jobButtonClassNames}
                         title="Jobs"
                         onClick={() => {
                             cell.setView('jobs');
                         }}
-                    >
-                        <span className="jobtabbuttonicon tabbuttonicon"></span>
-                    </span>
+                    />
                     <span
                         className={tasksButtonClassNames}
                         title="Tasks"
                         onClick={() => {
                             cell.setView('taskchart');
                         }}
-                    >
-                        <span className="taskviewtabbuttonicon tabbuttonicon"></span>
-                    </span>
+                    />
                     <span
                         className={timelineButtonClassNames}
                         title="Event Timeline"
                         onClick={() => {
                             cell.setView('timeline');
                         }}
-                    >
-                        <span className="timelinetabbuttonicon tabbuttonicon"></span>
-                    </span>
-                    <span className="sparkuitabbutton tabbutton" title="Open the Spark UI">
-                        <span className="sparkuitabbuttonicon tabbuttonicon"></span>
-                    </span>
+                    />
+                    <span className="sparkuitabbuttonicon tabbutton" title="Open the Spark UI" />
                     <span
-                        className="closebutton tabbutton"
+                        className="closebuttonicon tabbutton"
                         title="Close Display"
                         onClick={() => {
                             cell.toggleHideCellDisplay();
                         }}
-                    >
-                        <span className="closebuttonicon tabbuttonicon"></span>
-                    </span>
-                </span>
-            </span>
+                    />
+                </div>
+            </div>
         </div>
     );
 });
