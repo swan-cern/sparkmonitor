@@ -1,6 +1,4 @@
 .pm {
-    /* border: 1px solid #EEEEEE; */
-    /* box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.4); */
     background-color: #f7f7f7;
     margin: 8px 0px;
 }
@@ -8,19 +6,20 @@
 /*--------------Title Bar--------------------*/
 .pm .title {
     background-color: #f37600;
-    overflow: hidden;
-    height: 30px;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: flex-end;
 }
 
 .pm .titleright {
-    float: right;
-    position: relative;
-    height: 100%;
+    display: flex;
+    align-items: stretch;
+    height: 30px;
 }
 
 .pm .titleleft {
-    display: inline-block;
-    height: 100%;
+    flex-grow: 1;
+    height: 30px;
 }
 
 .pm .tbitem {
@@ -107,13 +106,14 @@
     font: larger;
 }
 
-.pm .tabbuttonicon {
+.pm .tabbutton {
     display: inline-block;
-    position: relative;
-    top: -2px;
-    width: 24px;
-    height: 24px;
-    vertical-align: middle;
+    width: 30px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: auto;
+    cursor: pointer;
+    cursor: hand;
 }
 
 .pm .timelinetabbuttonicon {
@@ -128,7 +128,7 @@
     background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAQAAABKfvVzAAAAQ0lEQVR4Ac3SsQ2AQAzF0LcgOrH/AuSWCHUa0pxQ7Pa7++ZyC/nhthRCNoZC9h4OMCXA9ACDg7+/tNv5o7BEM79M5QVZbBWGPizgRwAAAABJRU5ErkJggg==);
 }
 
-.pm .jobtabbuttonicon {
+.pm .jobtabletabbuttonicon {
     background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAQAAABKfvVzAAAAG0lEQVR4AWMY2eA/BMJYmHAQahj19Kinhz0AAOazv0F7pjjzAAAAAElFTkSuQmCC);
 }
 
@@ -139,18 +139,6 @@
 .pm .closebuttonicon {
     background-size: 20px;
     background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAQAAABKfvVzAAAAa0lEQVR4AeWSsREDIQwEtwlRhO3vP0JFPLgeHJDdnEfBh2y8F2hHnM5FJ1AayRtLshiE6F8WHUsw9kT0m8BDMFlMotZ10rzuaHtS63qo6s8HWkaLFXpo5ErXyKWukS25dRM5sXz+Pt+Ls/kBnolC6l7shJkAAAAASUVORK5CYII=);
-    background-repeat: no-repeat;
-    background-position: center;
-}
-
-.pm .tabbutton {
-    display: inline-block;
-    position: relative;
-    height: 100%;
-    font-size: small;
-    cursor: pointer;
-    cursor: hand;
-    padding: 5px 18px;
 }
 
 .pm .closebutton {
@@ -159,9 +147,8 @@
 }
 
 .pm .tabbuttons {
-    margin: 0px 0px;
-    font-size: 0;
-    /* border: 0 1px solid #c25e00; */
+    display: flex;
+    align-items: stretch;
 }
 
 .pm .tabbutton:hover {
@@ -181,13 +168,6 @@
 }
 
 /*--------------Content--------------------*/
-.pm .content {
-    /*padding: 5px;*/
-    /*resize: vertical;*/
-    /*overflow: hidden;*/
-    float: clear;
-}
-
 .pm .tabcontent {
     border: 1px solid #eeeeee;
 }
