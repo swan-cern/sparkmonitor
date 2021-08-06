@@ -13,11 +13,7 @@ export const CellMonitor = observer(() => {
     const cell = useCellStore();
 
     // If the cell has no spark job
-    if (cell?.jobIds?.length <= 0) {
-        return <div className="sparkMonitorCellRoot" />;
-    }
-
-    if (notebook?.hideAllDisplays || cell.isRemoved) {
+    if (!cell || cell?.jobIds?.length <= 0 || cell.isRemoved || notebook?.hideAllDisplays) {
         return <div className="sparkMonitorCellRoot" />;
     }
 
