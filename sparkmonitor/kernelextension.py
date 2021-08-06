@@ -61,7 +61,7 @@ class ScalaMonitor:
 
         Does nothing for now as this only works if kernel is not busy.
         """
-        logger.info('COMM MESSAGE:  \n %s', str(msg))
+        logger.debug('COMM MESSAGE:  \n %s', str(msg))
 
     def register_comm(self):
         """Register a comm_target which will be used by
@@ -122,7 +122,7 @@ class SocketThread(Thread):
                 totalMessage = pieces[-1]
                 messages = pieces[:-1]
                 for msg in messages:
-                    logger.info('Message Received: \n%s\n', msg)
+                    logger.debug('Message Received: \n%s\n', msg)
                     self.onrecv(msg)
             logger.info('Socket Exiting Client Loop')
             try:
@@ -154,17 +154,9 @@ def load_ipython_extension(ipython):
     global ip, monitor  # For Debugging
 
     global logger
-    logger = logging.getLogger('sparkmonitorkernel')
-    logger.setLevel(logging.DEBUG)
-    logger.propagate = False
-    # For debugging this module - Writes logs to a file
-    fh = logging.FileHandler('sparkmonitor_kernelextension.log', mode='w')
-    fh.setLevel(logging.DEBUG)
-    formatter = logging.Formatter(
-        '%(levelname)s:  %(asctime)s - %(name)s - %(process)d - %(processName)s - \
-        %(thread)d - %(threadName)s\n %(message)s \n')
-    fh.setFormatter(formatter)
-    logger.addHandler(fh)
+    logger = logging.getLogger('tornado.sparkmonitor.kernel')
+    logger.setLevel(logging.INFO)
+    logger.propagate = True
 
     if ipykernel_imported:
         if not isinstance(ipython, zmqshell.ZMQInteractiveShell):
@@ -209,7 +201,7 @@ def configure(conf):
     """
     global monitor
     port = monitor.getPort()
-    print('SparkConf Configured, Starting to listen on port:', str(port))
+    logger.info('SparkConf Configured, Starting to listen on port:', str(port))
     os.environ['SPARKMONITOR_KERNEL_PORT'] = str(port)
     logger.info(os.environ['SPARKMONITOR_KERNEL_PORT'])
     spark_scala_version = get_spark_scala_version()
