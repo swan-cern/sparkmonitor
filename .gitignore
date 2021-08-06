@@ -5,6 +5,7 @@
 sparkmonitor/labextension
 scalalistener/project/
 scalalistener/target/
+sparkmonitor/*.jar
 *.egg-info/
 dist/
 build/
