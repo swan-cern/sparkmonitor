@@ -9,6 +9,7 @@ from __future__ import unicode_literals
 
 import logging
 import os
+import subprocess
 import socket
 from threading import Thread
 
@@ -211,16 +212,27 @@ def configure(conf):
     print('SparkConf Configured, Starting to listen on port:', str(port))
     os.environ['SPARKMONITOR_KERNEL_PORT'] = str(port)
     logger.info(os.environ['SPARKMONITOR_KERNEL_PORT'])
-    conf.set('spark.extraListeners',
-             'sparkmonitor.listener.JupyterSparkMonitorListener')
-    # jarpath = os.path.abspath(os.path.dirname(__file__)) + '/listener.jar'
-    jarpath = pkg_resources.resource_filename(__name__, '/listener.jar')
-    logger.info('Adding jar from %s ', jarpath)
-    print('JAR PATH:' + jarpath)
-    conf.set('spark.driver.extraClassPath', jarpath)
+    spark_scala_version = get_spark_scala_version()
+    if "2.11" in spark_scala_version:
+        jarpath = os.path.abspath(os.path.dirname(__file__)) + "/listener_2.11.jar"
+        logger.info('Adding jar from %s ', jarpath)
+        conf.set('spark.driver.extraClassPath', jarpath)
+        conf.set('spark.extraListeners', 'sparkmonitor.listener.JupyterSparkMonitorListener')
+    elif "2.12" in spark_scala_version:
+        jarpath = os.path.abspath(os.path.dirname(__file__)) + "/listener_2.12.jar"
+        logger.info('Adding jar from %s ', jarpath)
+        conf.set('spark.driver.extraClassPath', jarpath)
+        conf.set('spark.extraListeners', 'sparkmonitor.listener.JupyterSparkMonitorListener')
+    else:
+        logger.warn("Unknown scala version skipped configuring listener jar.")
 
 
 def sendToFrontEnd(msg):
     """Send a message to the frontend through the singleton monitor object."""
     global monitor
     monitor.send(msg)
+
+def get_spark_scala_version():
+    cmd = "pyspark --version 2>&1 | grep -m 1  -Eo '[0-9]*[.][0-9]*[.][0-9]*[,]' | sed 's/,$//'"
+    version = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding="utf-8")
+    return version.stdout.strip()
