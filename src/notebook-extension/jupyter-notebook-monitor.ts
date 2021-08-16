@@ -14,6 +14,8 @@ export class JupyterNotebookSparkMonitor {
 
     constructor() {
         cellTracker.register();
+
+        // For jupyter notebook a single page has only one notebook.
         store.notebooks['default'] = new NotebookStore('default');
         this.notebookStore = store.notebooks['default'];
 
@@ -143,7 +145,7 @@ export class JupyterNotebookSparkMonitor {
     onSparkJobStart(data: any) {
         const cell = cellTracker.getRunningCell();
         if (!cell) {
-            console.error('SparkMonitor: Job started with no running cell.');
+            console.error('SparkMonitor: Job start event with no running cell.');
             return;
         }
         this.notebookStore.onSparkJobStart(cell.cell_id, data);
@@ -152,7 +154,7 @@ export class JupyterNotebookSparkMonitor {
     onSparkStageSubmitted(data: any) {
         const cell = cellTracker.getRunningCell();
         if (!cell) {
-            console.error('SparkMonitor: Job started with no running cell.');
+            console.error('SparkMonitor: Stage submit event with no running cell.');
             return;
         }
         this.notebookStore.onSparkStageSubmitted(cell.cell_id, data);

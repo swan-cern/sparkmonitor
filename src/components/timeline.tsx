@@ -8,10 +8,6 @@ import { useCellStore, useNotebookStore } from '../store';
 import { ErrorBoundary } from './error-boundary';
 
 const timelineOptions: TimelineOptions = {
-    // rollingMode: {
-    //     follow: false,
-    //     offset: 0.75,
-    // },
     margin: {
         item: 2,
         axis: 2,
@@ -19,8 +15,6 @@ const timelineOptions: TimelineOptions = {
     stack: true,
     showTooltips: true,
     minHeight: '100px',
-    // zoomMax: 10800000,
-    // zoomMin: 2000,
     editable: false,
     tooltip: {
         overflowMethod: 'cap',
@@ -77,19 +71,15 @@ export const Timeline = observer(() => {
             return;
         }
         const timeline = new VisTimeline(timelineDiv.current, timelineData, timelineGroups, timelineOptions);
-        const refreshInterval = setInterval(() => {
-            //
-        });
         return () => {
-            clearInterval(refreshInterval);
             timeline.destroy();
         };
     });
     return (
         <ErrorBoundary>
-            <div className="timelinecontent tabcontent">
+            <div className="tabcontent">
                 <div className="timelinewrapper hidephases">
-                    <div ref={timelineDiv} className="timelinecontainer1"></div>
+                    <div ref={timelineDiv}></div>
                 </div>
             </div>
         </ErrorBoundary>

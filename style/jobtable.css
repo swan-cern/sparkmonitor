@@ -160,9 +160,12 @@ progress {
 .pm .PENDING,
 .pm .SKIPPED {
     font-size: 75%;
-    padding: 4px 8px;
     color: white;
     border-radius: 2px;
+}
+.pm .tdstagestatus > span,
+.pm .tdjobstatus > span {
+    padding: 4px 8px;
 }
 
 .pm .stagetable tr th {
