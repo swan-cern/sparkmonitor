@@ -1,17 +1,25 @@
 import React from 'react';
 
-export class ErrorBoundary extends React.Component<any, any> {
-    constructor(props: any) {
+type Props = {
+    children: React.ReactNode;
+};
+
+type State = {
+    hasError: boolean;
+};
+
+export class ErrorBoundary extends React.Component<Props, State> {
+    constructor(props: Props) {
         super(props);
         this.state = { hasError: false };
     }
 
-    static getDerivedStateFromError(error: any) {
+    static getDerivedStateFromError(error: Error) {
         return { hasError: true };
     }
 
-    componentDidCatch(error: any, errorInfo: any) {
-        console.log('React Error Boundary:', error, errorInfo);
+    componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+        console.log('SparkMonitor: Caught react error:', error, errorInfo);
     }
 
     render() {

@@ -8,7 +8,6 @@ import { Timeline } from './timeline';
 import { TaskChart } from './task-chart';
 
 export const CellMonitor = observer(() => {
-    // If user has toggled hide all displays
     const notebook = useNotebookStore();
     const cell = useCellStore();
 

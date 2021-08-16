@@ -21,7 +21,7 @@ class SparkJob {
     numCompletedTasks = 0;
     numFailedTasks = 0;
 
-    cell!: Cell;
+    cell?: Cell;
 
     get numActiveStages() {
         return this.uniqueStageIds.filter((stageId) => {
@@ -57,8 +57,6 @@ class SparkStage {
     uniqueJobId!: string;
     cellId!: string;
     stageId!: string;
-    // stageAttemptId: string;
-    // stageAttemptId: string;
     status!: 'UNKNOWN' | 'COMPLETED' | 'FAILED' | 'RUNNING' | 'PENDING' | 'SKIPPED';
     name!: string;
 
@@ -66,11 +64,8 @@ class SparkStage {
     numActiveTasks = 0;
     numCompletedTasks = 0;
     numFailedTasks = 0;
-    // parentIds: string[];
-    // parentIds: string[];
     submissionTime!: Date;
     completionTime?: Date;
-    // jobIds: string[];
 
     constructor() {
         makeAutoObservable(this);
@@ -81,7 +76,6 @@ class Cell {
     view: 'jobs' | 'taskchart' | 'timeline' = 'jobs';
     isCollapsed = false;
     isRemoved = false;
-    // status: 'executing' | 'executed' | 'removed' | 're-executed';
     jobIds: Array<string> = [];
     taskChartStore: TaskChartStore;
     constructor(public cellId: string, private notebookStore: NotebookStore) {
@@ -213,7 +207,7 @@ export class NotebookStore {
                     job.numTasks -= this.stages[uniqueStageId].numTasks;
                 }
             });
-            job.cell.taskChartStore.onSparkJobEnd(data);
+            job.cell?.taskChartStore.onSparkJobEnd(data);
         } else {
             console.warn('SparkMonitor: Could not identify job');
         }
@@ -226,22 +220,22 @@ export class NotebookStore {
             this.stages[uniqueStageId] = new SparkStage();
             this.stages[uniqueStageId].uniqueId = uniqueStageId;
         }
-        const stageData = this.stages[uniqueStageId];
-        stageData.cellId = cellId;
-        stageData.stageId = data.stageId;
-        stageData.status = 'RUNNING';
-        stageData.name = String(data.name).split(' ')[0];
-        stageData.submissionTime = submissionTime;
-        stageData.numTasks = data.numTasks;
+        const stage = this.stages[uniqueStageId];
+        stage.cellId = cellId;
+        stage.stageId = data.stageId;
+        stage.status = 'RUNNING';
+        stage.name = String(data.name).split(' ')[0];
+        stage.submissionTime = submissionTime;
+        stage.numTasks = data.numTasks;
     }
 
     onSparkStageCompleted(data: any) {
         const uniqueId = `${this.uniqueId}-stage-${data.stageId}`;
-        const stageData = this.stages[uniqueId];
-        if (stageData) {
-            stageData.status = data.status;
-            stageData.completionTime = new Date(data.completionTime);
-            stageData.submissionTime = new Date(data.submissionTime);
+        const stage = this.stages[uniqueId];
+        if (stage) {
+            stage.status = data.status;
+            stage.completionTime = new Date(data.completionTime);
+            stage.submissionTime = new Date(data.submissionTime);
         } else {
             console.warn('SparkMonitor: Unable to identify stage');
         }
@@ -265,31 +259,41 @@ export class NotebookStore {
 
     onSparkTaskStart(data: any) {
         const uniqueStageId = `${this.uniqueId}-stage-${data.stageId}`;
-        const stageData = this.stages[uniqueStageId];
-        stageData.numActiveTasks += 1;
-
-        const uniqueJobId = stageData.uniqueJobId;
-        const jobData = this.jobs[uniqueJobId];
-        jobData.numActiveTasks += 1;
-        jobData.cell.taskChartStore.onSparkTaskStart(data);
+        const stage = this.stages[uniqueStageId];
+        if (stage) {
+            stage.numActiveTasks += 1;
+            const uniqueJobId = stage.uniqueJobId;
+            const job = this.jobs[uniqueJobId];
+            if (job) {
+                job.numActiveTasks += 1;
+                job.cell?.taskChartStore.onSparkTaskStart(data);
+            }
+        }
     }
 
     onSparkTaskEnd(data: any) {
         const uniqueStageId = `${this.uniqueId}-stage-${data.stageId}`;
-        const stageData = this.stages[uniqueStageId];
-        const uniqueJobId = stageData.uniqueJobId;
-        const jobData = this.jobs[uniqueJobId];
+        const stage = this.stages[uniqueStageId];
+        if (stage) {
+            stage.numActiveTasks -= 1;
+            if (data.status === 'SUCCESS') {
+                stage.numCompletedTasks += 1;
+            } else {
+                stage.numFailedTasks += 1;
+            }
 
-        stageData.numActiveTasks -= 1;
-        jobData.numActiveTasks -= 1;
-        if (data.status === 'SUCCESS') {
-            stageData.numCompletedTasks += 1;
-            jobData.numCompletedTasks += 1;
-        } else {
-            stageData.numFailedTasks += 1;
-            jobData.numFailedTasks += 1;
+            const uniqueJobId = stage.uniqueJobId;
+            const job = this.jobs[uniqueJobId];
+            if (job) {
+                job.numActiveTasks -= 1;
+                if (data.status === 'SUCCESS') {
+                    job.numCompletedTasks += 1;
+                } else {
+                    job.numFailedTasks += 1;
+                }
+                job.cell?.taskChartStore.onSparkTaskEnd(data);
+            }
         }
-        jobData.cell.taskChartStore.onSparkTaskEnd(data);
     }
 }
 
