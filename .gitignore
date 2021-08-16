@@ -15,7 +15,6 @@ docs/
 lib/
 venv
 .tox
-yarn.lock
 .metals
 *.tsbuildinfo
 scalalistener/.bsp

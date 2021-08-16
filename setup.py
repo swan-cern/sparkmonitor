@@ -11,7 +11,12 @@ name = "sparkmonitor"
 
 lab_path = HERE / "sparkmonitor" / "labextension"
 
-ensured_targets = [str(lab_path / "package.json"), str(lab_path / "static/style.js")]
+ensured_targets = [
+    str(lab_path / "package.json"), 
+    str(HERE / "sparkmonitor" / "static/extension.js"),
+    str(HERE / "sparkmonitor" / "listener_2.11.jar"),
+    str(HERE / "sparkmonitor" / "listener_2.12.jar")
+    ]
 
 labext_name = "sparkmonitor"
 
