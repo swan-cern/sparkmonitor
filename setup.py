@@ -20,9 +20,13 @@ data_file_spec = [
     (f"share/jupyter/labextensions/sparkmonitor", str(HERE), "install.json"),
     (
         "etc/jupyter/jupyter_server_config.d",
-        "jupyter-config",
+        "jupyter-config/jupyter_server_config.d",
         "sparkmonitor.json",
-    ),
+    ),(
+        "etc/jupyter/jupyter_notebook_config.d",
+        "jupyter-config/jupyter_notebook_config.d",
+        "sparkmonitor.json",
+    )
 ]
 
 
@@ -37,7 +41,7 @@ pkg_json = json.loads((HERE / "package.json").read_bytes())
 setup(
     name=name,
     version=pkg_json["version"],
-    description="Spark Monitor Extension for Jupyter Lab",
+    description="Spark Monitor extension for Jupyter",
     long_description=long_description,
     long_description_content_type="text/markdown",
     author=pkg_json["author"]["name"],
@@ -58,9 +62,6 @@ setup(
         "jupyterlab~=3.0",
         "jupyter_packaging~=0.9,<2",
     ],
-    extras_require={
-      "pyspark": ["pyspark<3.0.0"]
-    },
     platforms="Linux, Mac OS X, Windows",
     keywords=["Jupyter", "JupyterLab", "JupyterLab3"],
     classifiers=[
