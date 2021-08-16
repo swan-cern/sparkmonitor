@@ -1,9 +1,5 @@
-# Spark Monitor - An extension for Jupyter Lab
-
-This project was originally written by krishnan-r as a Google Summer of Code project for Jupyter Notebook. [Check his website out here.](https://krishnan-r.github.io/sparkmonitor/)
-
-As a part of my internship as a Software Engineer at Yelp, I created this fork to update the extension to be compatible with JupyterLab - Yelp's choice for sharing and collaborating on notebooks.
-
+# SparkMonitor 
+An extension for [Jupyter Lab](https://jupyterlab.readthedocs.io/en/stable/) & [Jupyter Notebook](https://jupyter.org/) to monitor Apache Spark (pyspark) from notebooks
 ## About
 
 <table>
@@ -15,16 +11,16 @@ As a part of my internship as a Software Engineer at Yelp, I created this fork t
 <td><a href="https://user-images.githubusercontent.com/6822941/29601568-d5e42934-87f9-11e7-9780-3cd3a0d8d86b.png" title="The SparkMonitor Extension."><img src="https://user-images.githubusercontent.com/6822941/29601568-d5e42934-87f9-11e7-9780-3cd3a0d8d86b.png" height="80"/></a></td>
 </tr>
 </table>
-SparkMonitor is an extension for Jupyter Lab that enables the live monitoring of Apache Spark Jobs spawned from a notebook. The extension provides several features to monitor and debug a Spark job from within the notebook interface itself. <br>
+SparkMonitor is an extension for Jupyter Notebook & Lab that enables the live monitoring of Apache Spark Jobs spawned from a notebook. The extension provides several features to monitor and debug a Spark job from within the notebook interface. <br>
 
 ---
 
 ![jobdisplay](https://user-images.githubusercontent.com/6822941/29753710-ff8849b6-8b94-11e7-8f9c-bdc59bf72143.gif)
 
-### Requirements
+## Requirements
 
--   At least JupyterLab 2.0.0 (necessary to get cell execution metadata)
--   pyspark 2.X.X or older (pyspark 3.X is currently not supported)
+-   Jupyter Lab 3 OR Jupyter Notebook 4.4.0 or higher
+-   pyspark 2 or 3
 
 ## Features
 
@@ -51,15 +47,6 @@ SparkMonitor is an extension for Jupyter Lab that enables the live monitoring of
 </table>
 
 ## Quick Start
-
-### To do a quick test of the extension
-
-This docker image has pyspark and several other related packages installed alongside the sparkmonitor extension.
-
-```bash
-docker run -it -p 8888:8888 itsjafer/sparkmonitor
-```
-
 ### Setting up the extension
 
 ```bash
@@ -103,12 +90,6 @@ spark.sparkContext.parallelize(range(0,100)).count()
 spark.sparkContext.parallelize(range(0,100)).count()
 spark.sparkContext.parallelize(range(0,100)).count()
 ```
-
-## Changelog
-
-* 1.0 - Initial Release
-* 2.0 - Migration to JupyterLab 2, Multiple Spark Sessions, and displaying monitors beneath the correct cell more accurately
-* 3.0 - Migrate to JupyterLab 3 as prebuilt extension
 ## Development
 
 If you'd like to develop the extension:
@@ -119,3 +100,13 @@ source venv/bin/activate # Make sure we're using the virtual environment
 make build # Build the extension
 make develop # Run a local jupyterlab with the extension installed
 ```
+
+## History
+- This project was originally written by krishnan-r as a [Google Summer of Code project](https://github.com/krishnan-r/sparkmonitor) for Jupyter Notebook with the [SWAN](https://swan.web.cern.ch/swan/) Notebook Service team at [CERN](http://home.cern/).
+
+- Further fixes and improvements were made by the team at CERN and members of the community maintained at [swan-cern/jupyter-extensions/tree/master/SparkMonitor](https://github.com/swan-cern/jupyter-extensions/tree/master/SparkMonitor)
+
+- [Jafer Haider](https://github.com/itsjafer) created the fork [jupyterlab-sparkmonitor](https://github.com/itsjafer/jupyterlab-sparkmonitor) to update the extension to be compatible with JupyterLab as part of his internship at Yelp.
+
+- This repository merges all the work done above and provides support for Lab & Notebook from a single package. 
+
