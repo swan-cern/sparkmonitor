@@ -15,7 +15,8 @@ import scala.collection.mutable.{ HashMap, HashSet, LinkedHashMap, ListBuffer }
 import java.net._
 import java.io._
 import org.apache.log4j.Logger
-import java.util.concurrent._
+import java.util.concurrent.{BlockingQueue, LinkedBlockingQueue}
+import java.util.{TimerTask,Timer}
 
 /**
  * A SparkListener Implementation that forwards data to a Jupyter Kernel
@@ -37,18 +38,17 @@ class JupyterSparkMonitorListener(conf: SparkConf) extends SparkListener {
   val port = scala.util.Properties.envOrElse("SPARKMONITOR_KERNEL_PORT", "ERRORNOTFOUND")
   logger.info("Port obtained from environment: " + port)
   var socket: Socket = null
-  var sparkTasksBufferSendTask: java.util.TimerTask = null
+  var onStageStatusActiveTask: TimerTask = null
   val sparkTasksQueue: BlockingQueue[String] = new LinkedBlockingQueue[String]()
   var out: OutputStreamWriter = null
-  val sparkTaskRateMaxMessages: Integer = 250
-  val sparkTaskRate: Long = 1000L // 1s
+  val sparkStageActiveTasksMaxMessages: Integer = 250
+  val sparkStageActiveRate: Long = 1000L // 1s
 
   logger.info("Starting Connection")
   startConnection()
 
   /** Send a string message to the kernel using the socket. */
   def send(msg: String): Unit = {
-    val socketMsg = msg + ";EOD:"
     try {
       out.write(msg + ";EOD:")
       out.flush()
@@ -63,16 +63,16 @@ class JupyterSparkMonitorListener(conf: SparkConf) extends SparkListener {
       socket = new Socket("localhost", port.toInt)
       out = new OutputStreamWriter(socket.getOutputStream())
 
-      val t = new java.util.Timer()
+      val t = new Timer()
 
-      if (sparkTasksBufferSendTask == null) {
-        sparkTasksBufferSendTask = new java.util.TimerTask {
+      if (onStageStatusActiveTask == null) {
+        onStageStatusActiveTask = new TimerTask {
           def run() = {
-            sparkTasksBufferSend()
+            onStageStatusActive()
           }
         }
       }
-      t.schedule(sparkTasksBufferSendTask, sparkTaskRate, sparkTaskRate)
+      t.schedule(onStageStatusActiveTask, sparkStageActiveRate, sparkStageActiveRate)
     } catch {
       case exception: Throwable => logger.error("Exception creating socket: ", exception)
     }
@@ -83,16 +83,7 @@ class JupyterSparkMonitorListener(conf: SparkConf) extends SparkListener {
     logger.info("Closing Connection")
     out.close()
     socket.close()
-    sparkTasksBufferSendTask.cancel()
-  }
-
-  def sparkTasksBufferSend(): Unit = {
-    var count: Integer = 0
-
-    while (sparkTasksQueue != null && !sparkTasksQueue.isEmpty() && count <= sparkTaskRateMaxMessages) {
-      count = count + 1
-      send(sparkTasksQueue.take())
-    }
+    onStageStatusActiveTask.cancel()
   }
 
   type JobId = Int
@@ -318,8 +309,10 @@ class JupyterSparkMonitorListener(conf: SparkConf) extends SparkListener {
       trimStagesIfNecessary(failedStages)
       status = "FAILED"
     }
+
+    val jobIds = stageIdToActiveJobIds.get(stage.stageId)
     for (
-      activeJobsDependentOnStage <- stageIdToActiveJobIds.get(stage.stageId);
+      activeJobsDependentOnStage <- jobIds;
       jobId <- activeJobsDependentOnStage;
       jobData <- jobIdToData.get(jobId)
     ) {
@@ -340,7 +333,10 @@ class JupyterSparkMonitorListener(conf: SparkConf) extends SparkListener {
       ("completionTime" -> completionTime) ~
       ("submissionTime" -> submissionTime) ~
       ("numTasks" -> stage.numTasks) ~
-      ("status" -> status)
+      ("numFailedTasks" -> stageData.numFailedTasks) ~
+      ("numCompletedTasks" -> stageData.numCompletedTasks) ~
+      ("status" -> status) ~
+      ("jobIds" -> jobIds)
 
     logger.info("Stage Completed: " + stage.stageId)
     logger.debug(pretty(render(json)))
@@ -375,13 +371,47 @@ class JupyterSparkMonitorListener(conf: SparkConf) extends SparkListener {
       ("stageAttemptId" -> stage.attemptNumber) ~
       ("name" -> stage.name) ~
       ("numTasks" -> stage.numTasks) ~
-      //  ("details" -> stage.details) ~
       ("parentIds" -> stage.parentIds) ~
       ("submissionTime" -> submissionTime) ~
       ("jobIds" -> jobIds)
     logger.info("Stage Submitted: " + stage.stageId)
     logger.debug(pretty(render(json)))
     send(pretty(render(json)))
+  }
+
+  /** Called when scheduled stage tasks update was requested */
+  def onStageStatusActive(): Unit = {
+    // Update on status of active stages
+    for ((stageId, stageInfo) <- activeStages) {
+      val stageData = stageIdToData.getOrElseUpdate((stageInfo.stageId, stageInfo.attemptNumber), new StageUIData)
+      val jobIds = stageIdToActiveJobIds.get(stageInfo.stageId)
+      
+      val json = ("msgtype" -> "sparkStageActive") ~
+        ("stageId" -> stageInfo.stageId) ~
+        ("stageAttemptId" -> stageInfo.attemptNumber) ~
+        ("name" -> stageInfo.name) ~
+        ("parentIds" -> stageInfo.parentIds) ~
+        ("numTasks" -> stageInfo.numTasks) ~
+        ("numActiveTasks" -> stageData.numActiveTasks) ~
+        ("numFailedTasks" -> stageData.numFailedTasks) ~
+        ("numCompletedTasks" -> stageData.numCompletedTasks) ~
+        ("jobIds" -> jobIds)
+
+      logger.info("Stage Update: " + stageInfo.stageId)
+      logger.debug(pretty(render(json)))
+      send(pretty(render(json)))
+    }
+
+    // Emit sparkStageActiveTasksMaxMessages spark tasks details from queue to frontend
+    var count: Integer = 0
+    while (sparkTasksQueue != null && !sparkTasksQueue.isEmpty() && count <= sparkStageActiveTasksMaxMessages) {
+      count = count + 1
+      send(sparkTasksQueue.take())
+    }
+
+    if (count > 0) {
+      logger.info("Stage Tasks details updated: " + count)
+    }
   }
 
   /** Called when a task is started. */
@@ -448,7 +478,7 @@ class JupyterSparkMonitorListener(conf: SparkConf) extends SparkListener {
       errorMessage = taskEnd.reason match {
         case org.apache.spark.Success =>
           stageData.completedIndices.add(info.index)
-          stageData.numCompleteTasks += 1
+          stageData.numCompletedTasks += 1
           None
         case e: ExceptionFailure => // Handle ExceptionFailure because we might have accumUpdates
           stageData.numFailedTasks += 1
@@ -672,7 +702,7 @@ object UIData {
    */
   class StageUIData {
     var numActiveTasks: Int = _
-    var numCompleteTasks: Int = _
+    var numCompletedTasks: Int = _
     var completedIndices = new HashSet[Int]()
     var numFailedTasks: Int = _
     var description: Option[String] = None
