@@ -1,4 +1,4 @@
-import { NotebookStore } from '.';
+import { NotebookStore } from './notebook';
 
 export class TaskChartStore {
     jobDataX: Array<number> = [];
