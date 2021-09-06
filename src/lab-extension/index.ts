@@ -9,7 +9,8 @@ import { IMainMenu, MainMenu } from '@jupyterlab/mainmenu';
 import { Menu } from '@lumino/widgets';
 import SparkMonitor from './jupyterlab-sparkmonitor';
 import { JupyterFrontEnd } from '@jupyterlab/application';
-import { NotebookStore, store } from '../store';
+import { store } from '../store';
+import { NotebookStore } from '../store/notebook';
 
 /** Entrypoint: Called when the extension is loaded by jupyter. */
 const extension = {
@@ -20,7 +21,6 @@ const extension = {
         let monitor: SparkMonitor;
         console.log('JupyterLab SparkMonitor is activated!');
         notebooks.widgetAdded.connect(async (sender, nbPanel) => {
-            console.log('Notebook added!');
             let notebookStore = store.notebooks[nbPanel.id];
             if (!notebookStore) {
                 notebookStore = new NotebookStore(nbPanel.id);

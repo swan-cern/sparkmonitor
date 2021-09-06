@@ -6,9 +6,9 @@ import { ICommMsgMsg } from '@jupyterlab/services/lib/kernel/messages';
 import { PanelLayout } from '@lumino/widgets';
 import CurrentCellTracker from './current-cell';
 import { CellWidget } from '../components';
-import { NotebookStore } from '../store';
 import { ReactWidget } from '@jupyterlab/apputils';
 
+import type { NotebookStore } from '../store/notebook';
 export default class JupyterLabSparkMonitor {
     currentCellTracker: CurrentCellTracker;
     cellExecCountSinceSparkJobStart = 0;
@@ -48,7 +48,6 @@ export default class JupyterLabSparkMonitor {
             if (cellModel.type === 'code') {
                 const codeCell = this.notebookPanel.content.widgets.find((widget) => widget.model === cellModel);
                 if (codeCell && !codeCell.node.querySelector('.sparkMonitorCellRoot')) {
-                    console.log('Creating cell', cellModel.id);
 
                     const widget = ReactWidget.create(
                         React.createElement(CellWidget, {
@@ -138,7 +137,6 @@ export default class JupyterLabSparkMonitor {
         }
         if (msg.content.data.msgtype === 'fromscala') {
             const data: any = JSON.parse(msg.content.data.msg as string);
-            console.log('SparkMonitor: Recieved Comm Message', data);
             switch (data.msgtype) {
                 case 'sparkJobStart':
                     this.onSparkJobStart(data);
@@ -151,6 +149,9 @@ export default class JupyterLabSparkMonitor {
                     break;
                 case 'sparkStageCompleted':
                     this.notebookStore.onSparkStageCompleted(data);
+                    break;
+                case 'sparkStageActive':
+                    this.notebookStore.onSparkStageActive(data);
                     break;
                 case 'sparkTaskStart':
                     this.notebookStore.onSparkTaskStart(data);

@@ -57,7 +57,6 @@ export default class CurrentCellTracker {
     }
 
     private cellMetadataChanged(cellModel: ICellModel) {
-        console.log('Cell metadata changed');
         const codeCell = this.getCodeCellFromModel(cellModel);
 
         if (codeCell) {
@@ -67,7 +66,6 @@ export default class CurrentCellTracker {
                     executionMetadata['iopub.status.busy'] &&
                     this.lastBusySignal !== executionMetadata['iopub.status.busy']
                 ) {
-                    console.log('we have an active cell!');
                     this.activeCell = codeCell;
                     this.cellReexecuted = this.lastExecutedCell === codeCell;
                     this.lastExecutedCell = codeCell;

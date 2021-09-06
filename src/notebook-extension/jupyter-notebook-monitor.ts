@@ -39,9 +39,6 @@ export class JupyterNotebookSparkMonitor {
     }
 
     startComm() {
-        if (this.comm) {
-            // this.comm.close();
-        }
         console.log('SparkMonitor: Starting Comm with kernel.');
         if (Jupyter.notebook.kernel) {
             this.comm = Jupyter.notebook.kernel.comm_manager.new_comm('SparkMonitor', { msgtype: 'openfromfrontend' });
@@ -115,6 +112,9 @@ export class JupyterNotebookSparkMonitor {
                     break;
                 case 'sparkStageCompleted':
                     this.notebookStore.onSparkStageCompleted(data);
+                    break;
+                case 'sparkStageActive':
+                    this.notebookStore.onSparkStageActive(data);
                     break;
                 case 'sparkTaskStart':
                     this.notebookStore.onSparkTaskStart(data);
