@@ -1,7 +1,7 @@
 {
     "NotebookApp": {
-      "nbserver_extensions": {
-        "sparkmonitor": true
-      }
+        "nbserver_extensions": {
+            "sparkmonitor": true
+        }
     }
 }

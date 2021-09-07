@@ -48,7 +48,6 @@ export default class JupyterLabSparkMonitor {
             if (cellModel.type === 'code') {
                 const codeCell = this.notebookPanel.content.widgets.find((widget) => widget.model === cellModel);
                 if (codeCell && !codeCell.node.querySelector('.sparkMonitorCellRoot')) {
-
                     const widget = ReactWidget.create(
                         React.createElement(CellWidget, {
                             notebookId: this.notebookPanel.id,

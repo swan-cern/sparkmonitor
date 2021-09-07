@@ -20,38 +20,38 @@
 }
 
 .taskdetails rect.scheduler-delay-proportion {
-    fill: #80B1D3;
-    stroke: #6B94B0;
+    fill: #80b1d3;
+    stroke: #6b94b0;
 }
 
 .taskdetails rect.deserialization-time-proportion {
-    fill: #FB8072;
-    stroke: #D26B5F;
+    fill: #fb8072;
+    stroke: #d26b5f;
 }
 
 .taskdetails rect.shuffle-read-time-proportion {
-    fill: #FDB462;
-    stroke: #D39651;
+    fill: #fdb462;
+    stroke: #d39651;
 }
 
 .taskdetails rect.executor-runtime-proportion {
-    fill: #B3DE69;
-    stroke: #95B957;
+    fill: #b3de69;
+    stroke: #95b957;
 }
 
 .taskdetails rect.shuffle-write-time-proportion {
-    fill: #FFED6F;
-    stroke: #D5C65C;
+    fill: #ffed6f;
+    stroke: #d5c65c;
 }
 
 .taskdetails rect.serialization-time-proportion {
-    fill: #BC80BD;
-    stroke: #9D6B9E;
+    fill: #bc80bd;
+    stroke: #9d6b9e;
 }
 
 .taskdetails rect.getting-result-time-proportion {
-    fill: #8DD3C7;
-    stroke: #75B0A6;
+    fill: #8dd3c7;
+    stroke: #75b0a6;
 }
 
 .taskdetails .taskbarsvg {
@@ -117,30 +117,35 @@
 }
 
 .taskdetails .RUNNING {
-    background-color: #42A5F5;
+    background-color: #42a5f5;
 }
 
 .taskdetails .FAILED {
-    background-color: #DB3636;
+    background-color: #db3636;
 }
 
 .taskdetails .KILLED {
-    background-color: #DB3636;
+    background-color: #db3636;
 }
 
 .taskdetails .COMPLETED {
-    background-color: #20B520;
+    background-color: #20b520;
 }
 
 .taskdetails .SUCCESS {
-    background-color: #20B520;
+    background-color: #20b520;
 }
 
 .taskdetails .UNKNOWN {
     background-color: #9c27b0;
 }
 
-.taskdetails .COMPLETED, .taskdetails .FAILED, .taskdetails .KILLED, .taskdetails .RUNNING, .taskdetails .UNKNOWN, .taskdetails .SUCCESS {
+.taskdetails .COMPLETED,
+.taskdetails .FAILED,
+.taskdetails .KILLED,
+.taskdetails .RUNNING,
+.taskdetails .UNKNOWN,
+.taskdetails .SUCCESS {
     font-size: 75%;
     padding: 4px 8px;
     color: white;
