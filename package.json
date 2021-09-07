@@ -72,6 +72,7 @@
         "webpack-cli": "^3.3.10"
     },
     "scripts": {
+        "build:prod": "jlpm run build:lib && jlpm run build:labextension && jlpm run build:nbextension",
         "build": "jlpm run build:lib && jlpm run build:labextension",
         "build:lib": "tsc -p tsconfig.lab.json",
         "build:labextension": "jupyter labextension build .",
