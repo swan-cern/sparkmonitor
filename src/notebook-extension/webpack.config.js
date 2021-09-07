@@ -48,17 +48,6 @@ const config = {
                     },
                 },
             },
-            {
-                test: /node_modules[\\\/]vis[\\\/].*\.js$/,
-                use: {
-                    loader: 'babel-loader',
-                    options: {
-                        cacheDirectory: true,
-                        presets: ['@babel/preset-env'],
-                        babelrc: false,
-                    },
-                },
-            },
         ],
     },
 };

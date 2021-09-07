@@ -1,5 +1,7 @@
-# SparkMonitor 
+# SparkMonitor
+
 An extension for [Jupyter Lab](https://jupyterlab.readthedocs.io/en/stable/) & [Jupyter Notebook](https://jupyter.org/) to monitor Apache Spark (pyspark) from notebooks
+
 ## About
 
 <table>
@@ -47,6 +49,7 @@ SparkMonitor is an extension for Jupyter Notebook & Lab that enables the live mo
 </table>
 
 ## Quick Start
+
 ### Setting up the extension
 
 ```bash
@@ -90,6 +93,7 @@ spark.sparkContext.parallelize(range(0,100)).count()
 spark.sparkContext.parallelize(range(0,100)).count()
 spark.sparkContext.parallelize(range(0,100)).count()
 ```
+
 ## Development
 
 If you'd like to develop the extension:
@@ -102,11 +106,11 @@ make develop # Run a local jupyterlab with the extension installed
 ```
 
 ## History
-- This project was originally written by krishnan-r as a [Google Summer of Code project](https://github.com/krishnan-r/sparkmonitor) for Jupyter Notebook with the [SWAN](https://swan.web.cern.ch/swan/) Notebook Service team at [CERN](http://home.cern/).
 
-- Further fixes and improvements were made by the team at CERN and members of the community maintained at [swan-cern/jupyter-extensions/tree/master/SparkMonitor](https://github.com/swan-cern/jupyter-extensions/tree/master/SparkMonitor)
+-   This project was originally written by krishnan-r as a [Google Summer of Code project](https://github.com/krishnan-r/sparkmonitor) for Jupyter Notebook with the [SWAN](https://swan.web.cern.ch/swan/) Notebook Service team at [CERN](http://home.cern/).
 
-- [Jafer Haider](https://github.com/itsjafer) created the fork [jupyterlab-sparkmonitor](https://github.com/itsjafer/jupyterlab-sparkmonitor) to update the extension to be compatible with JupyterLab as part of his internship at Yelp.
+-   Further fixes and improvements were made by the team at CERN and members of the community maintained at [swan-cern/jupyter-extensions/tree/master/SparkMonitor](https://github.com/swan-cern/jupyter-extensions/tree/master/SparkMonitor)
 
-- This repository merges all the work done above and provides support for Lab & Notebook from a single package. 
+-   [Jafer Haider](https://github.com/itsjafer) created the fork [jupyterlab-sparkmonitor](https://github.com/itsjafer/jupyterlab-sparkmonitor) to update the extension to be compatible with JupyterLab as part of his internship at Yelp.
 
+-   This repository merges all the work done above and provides support for Lab & Notebook from a single package.

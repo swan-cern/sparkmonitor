@@ -80,14 +80,15 @@
         "build:scalalistener": "cd scalalistener && sbt +package",
         "clean": "rimraf lib jupyterlab_sparkmonior:labextension",
         "clean:all": "jlpm run clean:lib && jlpm run clean:labextension",
-        "eslint": "eslint js/*.js --fix",
-        "eslint:check": "eslint .",
         "watch": "run-p watch:src watch:labextension",
         "watch:src": "tsc -w -p tsconfig.lab.json",
         "watch:labextension": "jupyter labextension watch .",
         "build:nbextension": "webpack --config src/notebook-extension/webpack.config.js",
         "watch:nbextension": "webpack --config src/notebook-extension/webpack.config.js --mode development --watch",
-        "check:nbextension": "tsc -p tsconfig.notebook.json"
+        "check:all": "jlpm run check:eslint && jlpm run check:nbextension && jlpm run check:labextension",
+        "check:eslint": "eslint .",
+        "check:nbextension": "tsc -p tsconfig.notebook.json",
+        "check:labextension": "tsc -p tsconfig.lab.json --noEmit"
     },
     "dependencies": {
         "@jupyterlab/application": "^3.0.4",
