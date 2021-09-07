@@ -6,7 +6,8 @@ import events from 'base/js/events';
 
 import { CellWidget } from '../components';
 import * as cellTracker from './currentcell';
-import { NotebookStore, store } from '../store';
+import { NotebookStore } from '../store/notebook';
+import { store } from '../store';
 
 export class JupyterNotebookSparkMonitor {
     comm: any = null;
