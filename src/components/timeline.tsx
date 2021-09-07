@@ -24,7 +24,7 @@ const timelineOptions: TimelineOptions = {
     verticalScroll: false,
 };
 
-export const Timeline = observer(() => {
+const Timeline = observer(() => {
     const notebook = useNotebookStore();
     const cell = useCellStore();
 
@@ -85,3 +85,5 @@ export const Timeline = observer(() => {
         </ErrorBoundary>
     );
 });
+
+export default Timeline;

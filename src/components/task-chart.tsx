@@ -42,7 +42,7 @@ const plotDefaultLayout: Partial<Plotly.Layout> = {
 
 const plotOptions = { displaylogo: false, scrollZoom: true };
 
-export const TaskChart = observer(() => {
+const TaskChart = observer(() => {
     const cell = useCellStore();
     const taskChartStore = cell.taskChartStore;
 
@@ -140,3 +140,4 @@ export const TaskChart = observer(() => {
         </ErrorBoundary>
     );
 });
+export default TaskChart;
