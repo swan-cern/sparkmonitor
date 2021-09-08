@@ -3,7 +3,6 @@
 
 This package contains two modules:
     kernelextension.py is the Jupyter kernel extension.
-    serverextension.py is the Jupyter web server extension.
 """
 from __future__ import absolute_import
 from __future__ import unicode_literals
@@ -21,13 +20,6 @@ def _jupyter_nbextension_paths():
         dest='sparkmonitor',
         # _also_ in the `nbextension/` namespace
         require='sparkmonitor/extension')]
-
-
-def _jupyter_server_extension_paths():
-    """Used by "jupyter serverextension" install web server extension'"""
-    return [{
-        'module': 'sparkmonitor.serverextension'
-    }]
 
 HERE = Path(__file__).parent.resolve()
 

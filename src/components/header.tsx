@@ -79,7 +79,7 @@ export const CellMonitorHeader = observer(() => {
                             cell.setView('timeline');
                         }}
                     />
-                    <span className="sparkuitabbuttonicon tabbutton" title="Open the Spark UI" />
+                    {/* TODO <span className="sparkuitabbuttonicon tabbutton" title="Open the Spark UI" /> */}
                     <span
                         className="closebuttonicon tabbutton"
                         title="Close Display"

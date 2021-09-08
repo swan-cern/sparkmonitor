@@ -23,15 +23,6 @@ labext_name = "sparkmonitor"
 data_file_spec = [
     (f"share/jupyter/labextensions/sparkmonitor", str(lab_path), "**"),
     (f"share/jupyter/labextensions/sparkmonitor", str(HERE), "install.json"),
-    (
-        "etc/jupyter/jupyter_server_config.d",
-        "jupyter-config/jupyter_server_config.d",
-        "sparkmonitor.json",
-    ),(
-        "etc/jupyter/jupyter_notebook_config.d",
-        "jupyter-config/jupyter_notebook_config.d",
-        "sparkmonitor.json",
-    )
 ]
 
 
@@ -62,8 +53,6 @@ setup(
     python_requires=">=3.6",
     data_files=get_data_files(data_file_spec),
     install_requires=[
-        "bs4",
-        "tornado",
         "jupyterlab~=3.0",
         "jupyter_packaging~=0.9,<2",
     ],
