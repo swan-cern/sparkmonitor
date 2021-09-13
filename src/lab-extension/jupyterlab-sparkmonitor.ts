@@ -38,7 +38,9 @@ export default class JupyterLabSparkMonitor {
         // listen for cell removed
         this.notebookPanel.content.model?.cells.changed.connect((_, data) => {
             if (data.type === 'remove') {
-                // TODO
+                data.oldValues.forEach((cell) => {
+                    notebookStore.onCellRemoved(cell.id);
+                });
             }
         });
     }

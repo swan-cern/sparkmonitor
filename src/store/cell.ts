@@ -7,7 +7,7 @@ export class Cell {
     view: 'jobs' | 'taskchart' | 'timeline' = 'jobs';
     isCollapsed = false;
     isRemoved = false;
-    jobIds: Array<string> = [];
+    uniqueJobIds: Array<string> = [];
     taskChartStore: TaskChartStore;
     constructor(public cellId: string, private notebookStore: NotebookStore) {
         makeAutoObservable(this);
@@ -29,7 +29,7 @@ export class Cell {
     }
 
     get jobs() {
-        return this.jobIds.map((id) => this.notebookStore.jobs[id]);
+        return this.uniqueJobIds.map((id) => this.notebookStore.jobs[id]);
     }
 
     get numActiveJobs() {
@@ -44,6 +44,6 @@ export class Cell {
     }
 
     get numTotalJobs() {
-        return this.jobIds.length;
+        return this.uniqueJobIds.length;
     }
 }

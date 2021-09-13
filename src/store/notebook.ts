@@ -31,8 +31,31 @@ export class NotebookStore {
         this.uniqueId = `app${this.applicationId}-attempt${this.applicationAttemptId}`;
     }
 
+    private deleteCellData(cellId: string) {
+        const cell = this.cells[cellId];
+        if (cell) {
+            cell.uniqueJobIds.forEach((uniqueJobId) => {
+                const job = this.jobs[uniqueJobId];
+                if (job) {
+                    job.uniqueStageIds.forEach((uniqueStageId) => {
+                        const stage = this.stages[uniqueStageId];
+                        if (stage) {
+                            delete this.stages[uniqueStageId];
+                        }
+                    });
+                    delete this.jobs[uniqueJobId];
+                }
+            });
+            delete this.cells[cellId];
+        }
+    }
+
+    onCellRemoved(cellId: string) {
+        this.deleteCellData(cellId);
+    }
+
     onCellExecutedAgain(cellId: string) {
-        delete this.cells[cellId];
+        this.deleteCellData(cellId);
         this.cells[cellId] = new Cell(cellId, this);
     }
 
@@ -75,7 +98,7 @@ export class NotebookStore {
         if (!this.cells[cellId]) {
             this.cells[cellId] = new Cell(cellId, this);
         }
-        this.cells[cellId].jobIds.push(job.uniqueId);
+        this.cells[cellId].uniqueJobIds.push(job.uniqueId);
         job.cell = this.cells[cellId];
         job.cell.taskChartStore.onSparkJobStart(data);
         this.jobs[job.uniqueId] = job;
@@ -167,11 +190,9 @@ export class NotebookStore {
         const uniqueStageId = `${this.uniqueId}-stage-${data.stageId}`;
         const stage = this.stages[uniqueStageId];
         if (stage) {
-            // stage.numActiveTasks += 1;
             const uniqueJobId = stage.uniqueJobId;
             const job = this.jobs[uniqueJobId];
             if (job) {
-                // job.numActiveTasks += 1;
                 job.cell?.taskChartStore.onSparkTaskStart(data);
             }
         }
@@ -181,21 +202,9 @@ export class NotebookStore {
         const uniqueStageId = `${this.uniqueId}-stage-${data.stageId}`;
         const stage = this.stages[uniqueStageId];
         if (stage) {
-            // stage.numActiveTasks -= 1;
-            // if (data.status === 'SUCCESS') {
-            //     stage.numCompletedTasks += 1;
-            // } else {
-            //     stage.numFailedTasks += 1;
-            // }
             const uniqueJobId = stage.uniqueJobId;
             const job = this.jobs[uniqueJobId];
             if (job) {
-                // job.numActiveTasks -= 1;
-                // if (data.status === 'SUCCESS') {
-                //     job.numCompletedTasks += 1;
-                // } else {
-                //     job.numFailedTasks += 1;
-                // }
                 job.cell?.taskChartStore.onSparkTaskEnd(data);
             }
         }
