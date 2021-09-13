@@ -5,12 +5,14 @@ const path = require('path');
 const config = {
     mode: 'production',
     entry: {
-        extension: path.join(__dirname, 'index.ts'),
+        extension: path.join(__dirname, 'entry.js'),
     },
     output: {
         path: path.join(__dirname, '../../sparkmonitor/static'),
         filename: '[name].js',
         libraryTarget: 'umd',
+        publicPath: '',
+        clean: true,
     },
     externals: ['require', 'base/js/namespace', 'base/js/events', 'notebook/js/codecell'],
     devtool: 'source-map',
@@ -26,8 +28,6 @@ const config = {
                     loader: 'babel-loader',
                     options: {
                         presets: ['@babel/preset-env', '@babel/preset-typescript', '@babel/preset-react'],
-
-                        plugins: ['add-module-exports'],
                     },
                 },
             },
