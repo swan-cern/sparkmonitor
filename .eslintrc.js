@@ -5,6 +5,7 @@ module.exports = {
         'plugin:@typescript-eslint/recommended',
         'plugin:prettier/recommended',
         'plugin:react/recommended',
+        'plugin:react-hooks/recommended',
     ],
     parser: '@typescript-eslint/parser',
     parserOptions: {
@@ -26,5 +27,5 @@ module.exports = {
             version: 'latest',
         },
     },
-    ignorePatterns: ['.eslintrc.js', 'prettier.config.js'],
+    ignorePatterns: ['.eslintrc.js', 'prettier.config.js', 'sparkmonitor/', 'lib/'],
 };
