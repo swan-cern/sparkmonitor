@@ -71,7 +71,7 @@ class ScalaMonitor:
 
     def target_func(self, comm, msg):
         """Callback function to be called when a frontend comm is opened"""
-        logger.info('COMM OPENED MESSAGE: \n %s \n', str(msg))
+        logger.info('SparkMonitor comm opened from frontend.')
         self.comm = comm
 
         @self.comm.on_msg
@@ -155,6 +155,7 @@ def load_ipython_extension(ipython):
 
     global logger
     logger = logging.getLogger('tornado.sparkmonitor.kernel')
+    logger.name = 'SparkMonitorKernel'
     logger.setLevel(logging.INFO)
     logger.propagate = True
 
@@ -187,12 +188,6 @@ def load_ipython_extension(ipython):
                 'conf': conf, 
                 'swan_spark_conf': conf # For backward compatibility with fork
                 })  # Add to users namespace
-
-
-def unload_ipython_extension(ipython):
-    """Called when extension is unloaded TODO if any"""
-    logger.info('Extension Unloaded')
-    pass
 
 
 def configure(conf):
