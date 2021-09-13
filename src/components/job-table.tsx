@@ -107,7 +107,6 @@ const JobItem = observer((props: { jobId: string }) => {
 
 export const JobTable = observer(() => {
     const cell = useCellStore();
-    const jobIds = cell.jobIds;
 
     return (
         <ErrorBoundary>
@@ -126,7 +125,7 @@ export const JobTable = observer(() => {
                         </tr>
                     </thead>
                     <tbody className="jobtablebody">
-                        {jobIds.map((jobId) => (
+                        {cell.uniqueJobIds.map((jobId) => (
                             <JobItem jobId={jobId} key={jobId} />
                         ))}
                     </tbody>
