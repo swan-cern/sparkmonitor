@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """Package sparkmonitor
-
-This package contains two modules:
-    kernelextension.py is the Jupyter kernel extension.
+    kernelextension.py is the Jupyter ipython kernel extension.
 """
 from __future__ import absolute_import
 from __future__ import unicode_literals
