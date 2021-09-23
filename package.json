@@ -1,7 +1,7 @@
 {
     "name": "sparkmonitor",
-    "version": "3.0.1",
-    "description": "Jupyter Lab extension to monitor Apache Spark Jobs",
+    "version": "2.0.0",
+    "description": "Jupyter Notebook & Lab extension to monitor Apache Spark jobs from a notebook",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/swan-cern/sparkmonitor.git"
@@ -20,8 +20,8 @@
     },
     "maintainers": [
         {
-            "name": "itsjafer",
-            "email": "itsjafer@gmail.com"
+            "name": "SWAN Team",
+            "email": "swan-admins@cern.ch"
         }
     ],
     "license": "Apache-2.0",
@@ -67,7 +67,7 @@
         "webpack-cli": "^3.3.10"
     },
     "scripts": {
-        "build:prod": "jlpm run build:lib && jlpm run build:labextension && jlpm run build:nbextension",
+        "build:prod": "jlpm run build:lib && jlpm run build:labextension && jlpm run build:nbextension && jlpm run build:scalalistener",
         "build": "jlpm run build:lib && jlpm run build:labextension",
         "build:lib": "tsc -p tsconfig.lab.json",
         "build:labextension": "jupyter labextension build .",

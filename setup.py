@@ -7,8 +7,6 @@ from setuptools import find_packages, setup
 
 HERE = Path(__file__).parent.resolve()
 
-name = "sparkmonitor"
-
 lab_path = HERE / "sparkmonitor" / "labextension"
 
 ensured_targets = [
@@ -17,8 +15,6 @@ ensured_targets = [
     str(HERE / "sparkmonitor" / "listener_2.11.jar"),
     str(HERE / "sparkmonitor" / "listener_2.12.jar")
     ]
-
-labext_name = "sparkmonitor"
 
 data_file_spec = [
     (f"share/jupyter/labextensions/sparkmonitor", str(lab_path), "**"),
@@ -35,9 +31,9 @@ long_description = (HERE / "README.md").read_text()
 pkg_json = json.loads((HERE / "package.json").read_bytes())
 
 setup(
-    name=name,
+    name=pkg_json["name"],
     version=pkg_json["version"],
-    description="Spark Monitor extension for Jupyter",
+    description=pkg_json["description"],
     long_description=long_description,
     long_description_content_type="text/markdown",
     author=pkg_json["author"]["name"],
