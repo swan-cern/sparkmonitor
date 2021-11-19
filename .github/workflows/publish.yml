@@ -1,0 +1,54 @@
+name: Publish To PyPI
+
+on:
+  push:
+    tags:
+       - 'v*'
+  
+jobs:
+  build-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set environnment package version from tag
+      run: echo "PACKAGE_VERSION=${GITHUB_REF#refs/*/v}" >> $GITHUB_ENV # extract "1.2.3" from refs/tags/v1.2.3
+      
+    - name: Install Python
+      uses: actions/setup-python@v1
+      with:
+        python-version: '3.x'
+
+    - name: Install node
+      uses: actions/setup-node@v1
+      with:
+        always-auth: true
+        node-version: '12.x'
+        registry-url: https://registry.npmjs.org
+   
+    - name: Set up JDK 1.8
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+
+    - name: Install dependencies 
+      run: pip install build twine
+
+    - name: Build wheel
+      run: python -m build
+
+    - name: Publish distribution to PyPI
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+      run: twine upload --repository pypi dist/*
+
+    - name: Invoke workflow in systemuser-image
+      uses: benc-uk/workflow-dispatch@v1
+      with:
+        workflow: SWAN CI/CD pipeline
+        ref: master
+        repo: swan-cern/systemuser-image
+        token: ${{ secrets.WORKFLOW_ACCESS_TOKEN }}
+        inputs: '{ "package": "sparkmonitor", "version": "${{env.PACKAGE_VERSION}}" }'
