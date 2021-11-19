@@ -22,9 +22,9 @@ data_file_spec = [
 ]
 
 
-builder = npm_builder(build_cmd="build:prod", build_dir=lab_path)
+builder = npm_builder(build_cmd="build:prod", build_dir=lab_path, source_dir="src")
 
-cmdclass = wrap_installers(post_develop=builder, pre_dist=builder, ensured_targets=ensured_targets)
+cmdclass = wrap_installers(post_develop=builder, ensured_targets=ensured_targets)
 
 long_description = (HERE / "README.md").read_text()
 
