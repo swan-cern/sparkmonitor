@@ -72,7 +72,7 @@
         "build:lib": "tsc -p tsconfig.lab.json",
         "build:labextension": "jupyter labextension build .",
         "build:labextension:dev": "jupyter labextension build --development True .",
-        "build:scalalistener": "cd scalalistener && sbt +package",
+        "build:scalalistener": "cd scalalistener && sbt +assembly",
         "clean": "rimraf lib jupyterlab_sparkmonior:labextension",
         "clean:all": "jlpm run clean:lib && jlpm run clean:labextension",
         "watch": "run-p watch:src watch:labextension",
