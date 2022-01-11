@@ -54,6 +54,6 @@ assembly / assemblyOutputPath := {
 }
 
 ThisBuild / assemblyShadeRules := Seq(
-  ShadeRule.rename("org.json4s.**" -> "ch.cern.swan.@1").inAll
+  ShadeRule.rename("org.json4s.**" -> "ch.cern.swan.org.json4s.@1").inAll
 )
 ThisBuild / assemblyPackageScala / assembleArtifact := false,
