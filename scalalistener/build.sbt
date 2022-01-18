@@ -7,7 +7,7 @@ crossScalaVersions := Seq("2.11.12", "2.12.15")
 organization := "cern"
 
 val sparkVersion2 = "2.4.7"
-val sparkVersion3 = "3.2.0"
+val sparkVersion3 = "3.0.1"
 
 libraryDependencies ++= {
   CrossVersion.partialVersion(scalaVersion.value) match {
