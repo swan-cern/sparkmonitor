@@ -18,3 +18,8 @@ venv
 .metals
 *.tsbuildinfo
 scalalistener/.bsp
+
+.vscode
+.metals
+.bloop
+.idea

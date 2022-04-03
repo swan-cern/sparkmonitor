@@ -1,7 +1,7 @@
 import React from 'react';
 import { ICellModel } from '@jupyterlab/cells';
 import { NotebookPanel } from '@jupyterlab/notebook';
-import { IComm, IKernelConnection } from '@jupyterlab/services/lib/kernel/kernel';
+import { IKernelConnection } from '@jupyterlab/services/lib/kernel/kernel';
 import { ICommMsgMsg } from '@jupyterlab/services/lib/kernel/messages';
 import { PanelLayout } from '@lumino/widgets';
 import CurrentCellTracker from './current-cell';
@@ -14,9 +14,6 @@ export default class JupyterLabSparkMonitor {
     cellExecCountSinceSparkJobStart = 0;
     kernel?: IKernelConnection;
 
-    /** Communication object with the kernel. */
-    comm?: IComm;
-
     constructor(private notebookPanel: NotebookPanel, private notebookStore: NotebookStore) {
         this.createCellReactElements();
         this.currentCellTracker = new CurrentCellTracker(notebookPanel);
@@ -25,13 +22,16 @@ export default class JupyterLabSparkMonitor {
             : this.notebookPanel.sessionContext.session?.kernel;
 
         // Fixes Reloading the browser
-        this.startComm();
+        this.kernel!.registerCommTarget('sparkmonitor-comm-target', (comm, _) => {
+            comm.onMsg = (message) => {
+                this.handleMessage(message);
+            };
+        });
 
         // Fixes Restarting the Kernel
-        this.kernel?.statusChanged.connect((_, status) => {
+        this.kernel!.statusChanged.connect((_, status) => {
             if (status === 'starting') {
                 this.currentCellTracker.cellReexecuted = false;
-                this.startComm();
             }
         });
 
@@ -84,28 +84,6 @@ export default class JupyterLabSparkMonitor {
 
     toggleAll() {
         this.notebookStore.toggleHideAllDisplays();
-    }
-
-    startComm() {
-        console.log('SparkMonitor: Starting Comm with kernel.');
-        this.currentCellTracker.ready().then(() => {
-            this.comm =
-                'createComm' in (this.kernel || {})
-                    ? this.kernel?.createComm('SparkMonitor')
-                    : (this.kernel as any).connectToComm('SparkMonitor');
-            if (!this.comm) {
-                console.warn('SparkMonitor: Unable to connect to comm');
-                return;
-            }
-            this.comm.open({ msgtype: 'openfromfrontend' });
-            this.comm.onMsg = (message) => {
-                this.handleMessage(message);
-            };
-            this.comm.onClose = (message) => {
-                // noop
-            };
-            console.log('SparkMonitor: Connection with comms established');
-        });
     }
 
     onSparkJobStart(data: any) {

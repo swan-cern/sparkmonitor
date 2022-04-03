@@ -29,25 +29,18 @@ const extension = {
 
             // JupyterLab 1.0 backwards compatibility
             let kernel;
-            let info;
             if ((nbPanel as any).session) {
                 await (nbPanel as any).session.ready;
                 kernel = (nbPanel as any).session.kernel;
                 await kernel.ready;
-                info = kernel.info;
             } else {
                 // JupyterLab 2.0
                 const { sessionContext } = nbPanel;
                 await sessionContext.ready;
                 kernel = sessionContext.session?.kernel;
-                info = await kernel?.info;
             }
-
-            if (info.language_info.name === 'python') {
-                monitor = new SparkMonitor(nbPanel, notebookStore);
-                console.log('Notebook kernel ready');
-                monitor.startComm();
-            }
+            monitor = new SparkMonitor(nbPanel, notebookStore);
+            console.log('Notebook kernel ready');
         });
 
         const commandID = 'toggle-monitor';
