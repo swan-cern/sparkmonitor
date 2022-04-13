@@ -4,16 +4,13 @@
 Receives data from listener and forwards to frontend.
 Adds a configuration object to users namespace.
 """
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 import logging
 import os
-import subprocess
 import socket
+import subprocess
 from threading import Thread
-
-import pkg_resources
 
 ipykernel_imported = True
 spark_imported = True
@@ -27,6 +24,7 @@ try:
 except ImportError:
     try:
         import findspark
+
         findspark.init()
         from pyspark import SparkConf
     except Exception:
@@ -67,7 +65,8 @@ class ScalaMonitor:
         """Register a comm_target which will be used by
         frontend to start communication."""
         self.ipython.kernel.comm_manager.register_target(
-            'SparkMonitor', self.target_func)
+            'SparkMonitor', self.target_func
+        )
 
     def target_func(self, comm, msg):
         """Callback function to be called when a frontend comm is opened"""
@@ -77,6 +76,7 @@ class ScalaMonitor:
         @self.comm.on_msg
         def _recv(msg):
             self.handle_comm_message(msg)
+
         comm.send({'msgtype': 'commopen'})
 
 
@@ -106,7 +106,7 @@ class SocketThread(Thread):
         Creates a socket and waits(blocking) for connections
         When a connection is closed, goes back into waiting.
         """
-        while(True):
+        while True:
             logger.info('Starting socket thread, going to accept')
             (client, addr) = self.sock.accept()
             logger.info('Client Connected %s', addr)
@@ -140,10 +140,7 @@ class SocketThread(Thread):
 
     def onrecv(self, msg):
         """Forwards all messages to the frontend"""
-        sendToFrontEnd({
-            'msgtype': 'fromscala',
-            'msg': msg
-        })
+        sendToFrontEnd({'msgtype': 'fromscala', 'msg': msg})
 
 
 def load_ipython_extension(ipython):
@@ -161,8 +158,7 @@ def load_ipython_extension(ipython):
 
     if ipykernel_imported:
         if not isinstance(ipython, zmqshell.ZMQInteractiveShell):
-            logger.warn(
-                'SparkMonitor: Ipython not running through notebook')
+            logger.warn('SparkMonitor: Ipython not running through notebook')
             return
     else:
         return
@@ -184,10 +180,12 @@ def load_ipython_extension(ipython):
         else:
             conf = SparkConf()  # Create a new conf
             configure(conf)
-            ipython.push({
-                'conf': conf, 
-                'swan_spark_conf': conf # For backward compatibility with fork
-                })  # Add to users namespace
+            ipython.push(
+                {
+                    'conf': conf,
+                    'swan_spark_conf': conf,  # For backward compatibility with fork
+                }
+            )  # Add to users namespace
 
 
 def configure(conf):
@@ -207,12 +205,16 @@ def configure(conf):
         jarpath = os.path.abspath(os.path.dirname(__file__)) + "/listener_2.11.jar"
         logger.info('Adding jar from %s ', jarpath)
         conf.set('spark.driver.extraClassPath', jarpath)
-        conf.set('spark.extraListeners', 'sparkmonitor.listener.JupyterSparkMonitorListener')
+        conf.set(
+            'spark.extraListeners', 'sparkmonitor.listener.JupyterSparkMonitorListener'
+        )
     elif "2.12" in spark_scala_version:
         jarpath = os.path.abspath(os.path.dirname(__file__)) + "/listener_2.12.jar"
         logger.info('Adding jar from %s ', jarpath)
         conf.set('spark.driver.extraClassPath', jarpath)
-        conf.set('spark.extraListeners', 'sparkmonitor.listener.JupyterSparkMonitorListener')
+        conf.set(
+            'spark.extraListeners', 'sparkmonitor.listener.JupyterSparkMonitorListener'
+        )
     else:
         logger.warn("Unknown scala version skipped configuring listener jar.")
 
@@ -222,7 +224,14 @@ def sendToFrontEnd(msg):
     global monitor
     monitor.send(msg)
 
+
 def get_spark_scala_version():
     cmd = "pyspark --version 2>&1 | grep -m 1  -Eo '[0-9]*[.][0-9]*[.][0-9]*[,]' | sed 's/,$//'"
-    version = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding="utf-8")
+    version = subprocess.run(
+        cmd,
+        shell=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        encoding="utf-8",
+    )
     return version.stdout.strip()
