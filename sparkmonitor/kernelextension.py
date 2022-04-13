@@ -52,7 +52,10 @@ class ScalaMonitor:
 
     def send(self, msg):
         """Send a message to the frontend"""
-        self.comm.send(msg)
+        if hasattr(self, "comm"):
+            self.comm.send(msg)
+        else:
+            logger.warn(f"No comm. Skipping message: {msg}")
 
     def handle_comm_message(self, msg):
         """Handle message received from frontend
