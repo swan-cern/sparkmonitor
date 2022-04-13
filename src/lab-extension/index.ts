@@ -12,6 +12,8 @@ import { JupyterFrontEnd } from '@jupyterlab/application';
 import { store } from '../store';
 import { NotebookStore } from '../store/notebook';
 
+const kernel_langs = ["python", "pyspark", "sparkR", "scala"]
+
 /** Entrypoint: Called when the extension is loaded by jupyter. */
 const extension = {
     id: 'jupyterlab_sparkmonitor',
@@ -43,7 +45,7 @@ const extension = {
                 info = await kernel?.info;
             }
 
-            if (info.language_info.name === 'python') {
+            if (kernel_langs.includes(info.language_info.name)) {
                 monitor = new SparkMonitor(nbPanel, notebookStore);
                 console.log('Notebook kernel ready');
                 monitor.startComm();
