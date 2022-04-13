@@ -35,6 +35,8 @@ class JupyterSparkMonitorListener(conf: SparkConf) extends SparkListener {
 
   val logger = Logger.getLogger(this.getClass.getName)
   logger.info("Started SparkListener for Jupyter Notebook")
+  val host = scala.util.Properties.envOrElse("SPARKMONITOR_KERNEL_HOST", "localhost")
+  logger.info("Host obtained from environment: " + host)
   val port = scala.util.Properties.envOrElse("SPARKMONITOR_KERNEL_PORT", "ERRORNOTFOUND")
   logger.info("Port obtained from environment: " + port)
   var socket: Socket = null
@@ -60,7 +62,7 @@ class JupyterSparkMonitorListener(conf: SparkConf) extends SparkListener {
   /** Start the socket connection to the kernel and start the send task. The kernel is the server already waiting for connections.*/
   def startConnection(): Unit = {
     try {
-      socket = new Socket("localhost", port.toInt)
+      socket = new Socket(host, port.toInt)
       out = new OutputStreamWriter(socket.getOutputStream())
 
       val t = new Timer()
