@@ -14,6 +14,7 @@ from threading import Thread
 
 ipykernel_imported = True
 spark_imported = True
+sparkmagic_port_key = ""
 try:
     from ipykernel import zmqshell
 except ImportError:
@@ -29,6 +30,18 @@ except ImportError:
         from pyspark import SparkConf
     except Exception:
         spark_imported = False
+
+try:
+    import sparkmagic.utils.configuration as sparkmagicconf
+
+    for key in sparkmagicconf.session_configs()["conf"]:
+        if "SPARKMONITOR_KERNEL_HOST" in key:
+            sparkmagic_port_key = key.replace(
+                "SPARKMONITOR_KERNEL_HOST", "SPARKMONITOR_KERNEL_PORT"
+            )
+            break
+except ImportError:
+    ...
 
 
 class ScalaMonitor:
@@ -89,6 +102,7 @@ class SocketThread(Thread):
 
     def __init__(self):
         """Constructor, initializes base class Thread."""
+        self.host = "0.0.0.0" if sparkmagic_port_key else "localhost"
         self.port = 0
         Thread.__init__(self)
 
@@ -96,7 +110,7 @@ class SocketThread(Thread):
         """Starts a socket on a random port and starts
         listening for connections"""
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.bind(('localhost', self.port))
+        self.sock.bind((self.host, self.port))
         self.sock.listen(5)
         self.port = self.sock.getsockname()[1]
         logger.info('Socket Listening on port %s', str(self.port))
@@ -189,6 +203,10 @@ def load_ipython_extension(ipython):
                     'swan_spark_conf': conf,  # For backward compatibility with fork
                 }
             )  # Add to users namespace
+    elif sparkmagic_port_key:
+        port = monitor.getPort()
+        sparkmagicconf.session_configs()["conf"][sparkmagic_port_key] = port
+        logger.info(f"SparkMagic conf updated. Started listening on port: {port}")
 
 
 def configure(conf):
