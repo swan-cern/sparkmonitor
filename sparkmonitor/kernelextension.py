@@ -14,6 +14,7 @@ from threading import Thread
 
 ipykernel_imported = True
 spark_imported = True
+sparkmagic_imported = True
 sparkmagic_port_key = ""
 try:
     from ipykernel import zmqshell
@@ -41,7 +42,7 @@ try:
             )
             break
 except ImportError:
-    ...
+    sparkmagic_imported = False
 
 
 class ScalaMonitor:
@@ -207,6 +208,11 @@ def load_ipython_extension(ipython):
         port = monitor.getPort()
         sparkmagicconf.session_configs()["conf"][sparkmagic_port_key] = port
         logger.info(f"SparkMagic conf updated. Started listening on port: {port}")
+    elif spark_imported:
+        logger.info(
+            "SparkMonitor couldn't be setup, but SparkMagic was found."
+            "Please see README for instructions on using SparkMonitor with SparkMagic."
+        )
 
 
 def configure(conf):
