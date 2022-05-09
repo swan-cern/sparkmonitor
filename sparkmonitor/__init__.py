@@ -10,6 +10,8 @@ from pathlib import Path
 
 from ._version import __version__ 
 
+from .connector import connect
+
 def _jupyter_nbextension_paths():
     """Used by 'jupyter nbextension' command to install frontend extension"""
     return [dict(
