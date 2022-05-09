@@ -4,19 +4,18 @@
 Receives data from listener and forwards to frontend.
 Adds a configuration object to users namespace.
 """
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 import logging
 import os
-import subprocess
 import socket
+import subprocess
 from threading import Thread
-
-import pkg_resources
 
 ipykernel_imported = True
 spark_imported = True
+sparkmagic_imported = True
+sparkmagic_port_key = ""
 try:
     from ipykernel import zmqshell
 except ImportError:
@@ -27,10 +26,23 @@ try:
 except ImportError:
     try:
         import findspark
+
         findspark.init()
         from pyspark import SparkConf
     except Exception:
         spark_imported = False
+
+try:
+    import sparkmagic.utils.configuration as sparkmagicconf
+
+    for key in sparkmagicconf.session_configs()["conf"]:
+        if "SPARKMONITOR_KERNEL_HOST" in key:
+            sparkmagic_port_key = key.replace(
+                "SPARKMONITOR_KERNEL_HOST", "SPARKMONITOR_KERNEL_PORT"
+            )
+            break
+except ImportError:
+    sparkmagic_imported = False
 
 
 class ScalaMonitor:
@@ -54,7 +66,10 @@ class ScalaMonitor:
 
     def send(self, msg):
         """Send a message to the frontend"""
-        self.comm.send(msg)
+        if hasattr(self, "comm"):
+            self.comm.send(msg)
+        else:
+            logger.warn(f"No comm. Skipping message: {msg}")
 
     def handle_comm_message(self, msg):
         """Handle message received from frontend
@@ -67,7 +82,8 @@ class ScalaMonitor:
         """Register a comm_target which will be used by
         frontend to start communication."""
         self.ipython.kernel.comm_manager.register_target(
-            'SparkMonitor', self.target_func)
+            'SparkMonitor', self.target_func
+        )
 
     def target_func(self, comm, msg):
         """Callback function to be called when a frontend comm is opened"""
@@ -77,6 +93,7 @@ class ScalaMonitor:
         @self.comm.on_msg
         def _recv(msg):
             self.handle_comm_message(msg)
+
         comm.send({'msgtype': 'commopen'})
 
 
@@ -86,6 +103,7 @@ class SocketThread(Thread):
 
     def __init__(self):
         """Constructor, initializes base class Thread."""
+        self.host = "0.0.0.0" if sparkmagic_port_key else "localhost"
         self.port = 0
         Thread.__init__(self)
 
@@ -93,7 +111,7 @@ class SocketThread(Thread):
         """Starts a socket on a random port and starts
         listening for connections"""
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.sock.bind(('localhost', self.port))
+        self.sock.bind((self.host, self.port))
         self.sock.listen(5)
         self.port = self.sock.getsockname()[1]
         logger.info('Socket Listening on port %s', str(self.port))
@@ -106,7 +124,7 @@ class SocketThread(Thread):
         Creates a socket and waits(blocking) for connections
         When a connection is closed, goes back into waiting.
         """
-        while(True):
+        while True:
             logger.info('Starting socket thread, going to accept')
             (client, addr) = self.sock.accept()
             logger.info('Client Connected %s', addr)
@@ -140,10 +158,7 @@ class SocketThread(Thread):
 
     def onrecv(self, msg):
         """Forwards all messages to the frontend"""
-        sendToFrontEnd({
-            'msgtype': 'fromscala',
-            'msg': msg
-        })
+        sendToFrontEnd({'msgtype': 'fromscala', 'msg': msg})
 
 
 def load_ipython_extension(ipython):
@@ -161,8 +176,7 @@ def load_ipython_extension(ipython):
 
     if ipykernel_imported:
         if not isinstance(ipython, zmqshell.ZMQInteractiveShell):
-            logger.warn(
-                'SparkMonitor: Ipython not running through notebook')
+            logger.warn('SparkMonitor: Ipython not running through notebook')
             return
     else:
         return
@@ -184,10 +198,21 @@ def load_ipython_extension(ipython):
         else:
             conf = SparkConf()  # Create a new conf
             configure(conf)
-            ipython.push({
-                'conf': conf, 
-                'swan_spark_conf': conf # For backward compatibility with fork
-                })  # Add to users namespace
+            ipython.push(
+                {
+                    'conf': conf,
+                    'swan_spark_conf': conf,  # For backward compatibility with fork
+                }
+            )  # Add to users namespace
+    elif sparkmagic_port_key:
+        port = monitor.getPort()
+        sparkmagicconf.session_configs()["conf"][sparkmagic_port_key] = port
+        logger.info(f"SparkMagic conf updated. Started listening on port: {port}")
+    elif spark_imported:
+        logger.info(
+            "SparkMonitor couldn't be setup, but SparkMagic was found."
+            "Please see README for instructions on using SparkMonitor with SparkMagic."
+        )
 
 
 def configure(conf):
@@ -207,12 +232,16 @@ def configure(conf):
         jarpath = os.path.abspath(os.path.dirname(__file__)) + "/listener_2.11.jar"
         logger.info('Adding jar from %s ', jarpath)
         conf.set('spark.driver.extraClassPath', jarpath)
-        conf.set('spark.extraListeners', 'sparkmonitor.listener.JupyterSparkMonitorListener')
+        conf.set(
+            'spark.extraListeners', 'sparkmonitor.listener.JupyterSparkMonitorListener'
+        )
     elif "2.12" in spark_scala_version:
         jarpath = os.path.abspath(os.path.dirname(__file__)) + "/listener_2.12.jar"
         logger.info('Adding jar from %s ', jarpath)
         conf.set('spark.driver.extraClassPath', jarpath)
-        conf.set('spark.extraListeners', 'sparkmonitor.listener.JupyterSparkMonitorListener')
+        conf.set(
+            'spark.extraListeners', 'sparkmonitor.listener.JupyterSparkMonitorListener'
+        )
     else:
         logger.warn("Unknown scala version skipped configuring listener jar.")
 
@@ -222,7 +251,14 @@ def sendToFrontEnd(msg):
     global monitor
     monitor.send(msg)
 
+
 def get_spark_scala_version():
     cmd = "pyspark --version 2>&1 | grep -m 1  -Eo '[0-9]*[.][0-9]*[.][0-9]*[,]' | sed 's/,$//'"
-    version = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding="utf-8")
+    version = subprocess.run(
+        cmd,
+        shell=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        encoding="utf-8",
+    )
     return version.stdout.strip()

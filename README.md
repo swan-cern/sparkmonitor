@@ -22,11 +22,11 @@ SparkMonitor is an extension for Jupyter Notebook & Lab that enables the live mo
 ## Requirements
 
 -   Jupyter Lab 3 OR Jupyter Notebook 4.4.0 or higher
--   pyspark 2 or 3
+-   Local pyspark 2/3 or [sparkmagic](https://github.com/jupyter-incubator/sparkmagic) to connect to a remote spark instance
 
 ## Features
 
--   Automatically displays a live monitoring tool below cells that run Spark jobs in a Jupyter notebook
+-   Automatically displays a live monitoring tool below cells that run Spark jobs
 -   A table of jobs and stages with progressbars
 -   A timeline which shows jobs, stages, and tasks
 -   A graph showing number of active tasks & executor cores vs time
@@ -48,7 +48,7 @@ pip install sparkmonitor # install the extension
 
 # set up an ipython profile and add our kernel extension to it
 ipython profile create # if it does not exist
-echo "c.InteractiveShellApp.extensions.append('sparkmonitor.kernelextension')" >>  $(ipython profile locate default)/ipython_kernel_config.py
+echo "c.InteractiveShellApp.extensions.append('sparkmonitor.kernelextension')" >> $(ipython profile locate default)/ipython_kernel_config.py
 
 # For use with jupyter notebook install and enable the nbextension
 jupyter nbextension install sparkmonitor --py
@@ -56,6 +56,8 @@ jupyter nbextension enable  sparkmonitor --py
 
 # The jupyterlab extension is automatically enabled
 ```
+
+### Connecting to a local spark instance
 
 With the extension installed, a `SparkConf` object called `conf` will be usable from your notebooks. You can use it as follows:
 
@@ -74,6 +76,19 @@ spark = SparkSession.builder\
         .config('spark.driver.extraClassPath', 'venv/lib/python3.<X>/site-packages/sparkmonitor/listener_<scala_version>.jar')\
         .getOrCreate()
 ```
+
+### Connecting to a remote spark instance via sparkmagic
+
+- Setup sparkmagic & verify everything is working fine
+- Copy the required jar file to the remote spark servers
+- Add listener_<scala_version>.jar to the spark job
+
+  For eg. set [spark.jars](https://spark.apache.org/docs/2.4.6/configuration.html#runtime-environment) to `https://github.com/swan-cern/sparkmonitor/releases/download/<release>/listener_<scala>.jar`
+
+- Set `spark.extraListeners` as above
+- Set `SPARKMONITOR_KERNEL_HOST` environment variable for the spark job using sparkmagic conf
+
+  For yarn, you may use [spark.yarn.appMasterEnv](https://spark.apache.org/docs/2.4.6/running-on-yarn.html#spark-properties) to set the variables
 
 ## Development
 
