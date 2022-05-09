@@ -12,7 +12,7 @@ import { JupyterFrontEnd } from '@jupyterlab/application';
 import { store } from '../store';
 import { NotebookStore } from '../store/notebook';
 
-const kernel_langs = ["python", "pyspark", "sparkR", "scala"]
+const kernel_langs = ['python', 'pyspark', 'sparkR', 'scala'];
 
 /** Entrypoint: Called when the extension is loaded by jupyter. */
 const extension = {
