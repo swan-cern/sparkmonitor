@@ -89,6 +89,7 @@ export class NotebookStore {
             stage.name = data.stageInfos[stageId].name;
             job.uniqueStageIds.push(uniqueStageId);
         });
+        job.uniqueStageIds.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
 
         if (job.name === 'null') {
             const lastStageId = Math.max.apply(null, data.stageIds);
