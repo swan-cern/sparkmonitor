@@ -38,7 +38,7 @@ const StageItem = observer((props: { stageId: string }) => {
 
 const StageTable = observer((props: { jobId: string }) => {
     const notebook = useNotebookStore();
-    const stageIds = notebook.jobs[props.jobId].uniqueStageIds;
+    const stageIds = notebook.jobs[props.jobId].uniqueStageIds.slice(0).sort();
     const rows = stageIds.map((stageId) => {
         return <StageItem stageId={stageId} key={stageId} />;
     });
