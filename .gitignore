@@ -18,3 +18,4 @@ venv
 .metals
 *.tsbuildinfo
 scalalistener/.bsp
+.yarn

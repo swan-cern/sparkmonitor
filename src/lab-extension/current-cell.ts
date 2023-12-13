@@ -34,7 +34,7 @@ export default class CurrentCellTracker {
         if (!(cellModel.id in this.cellSlotMap)) {
             const fn = () => this.cellMetadataChanged(cellModel);
             this.cellSlotMap[cellModel.id] = fn;
-            cellModel.metadata.changed.connect(fn);
+            cellModel.metadataChanged.connect(fn);
             // In case there was already metadata (do not highlight on first load)
             this.cellMetadataChanged(cellModel);
         }
@@ -43,7 +43,7 @@ export default class CurrentCellTracker {
     private deregisterMetadataChanges(cellModel: ICellModel) {
         const fn = this.cellSlotMap[cellModel.id];
         if (fn) {
-            cellModel.metadata.changed.disconnect(fn);
+            cellModel.metadataChanged.disconnect(fn);
         }
         delete this.cellSlotMap[cellModel.id];
     }
@@ -60,7 +60,7 @@ export default class CurrentCellTracker {
         const codeCell = this.getCodeCellFromModel(cellModel);
 
         if (codeCell) {
-            const executionMetadata: any = codeCell.model.metadata.get('execution');
+            const executionMetadata: any = codeCell.model.metadata['execution'];
             if (executionMetadata) {
                 if (
                     executionMetadata['iopub.status.busy'] &&
