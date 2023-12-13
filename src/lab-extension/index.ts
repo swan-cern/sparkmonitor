@@ -72,7 +72,7 @@ const extension = {
             args: {},
         });
 
-        mainMenu.addMenu(menu, { rank: 40 });
+        mainMenu.addMenu(menu, false, { rank: 40 });
     },
 };
 

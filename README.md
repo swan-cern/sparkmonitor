@@ -21,7 +21,7 @@ SparkMonitor is an extension for Jupyter Notebook & Lab that enables the live mo
 
 ## Requirements
 
--   Jupyter Lab 3 OR Jupyter Notebook 4.4.0 or higher
+-   Jupyter Lab 4 OR Jupyter Notebook 4.4.0 or higher
 -   pyspark 2 or 3
 
 ## Features
