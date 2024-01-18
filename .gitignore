@@ -9,7 +9,7 @@ node_modules/
 .ipynb_checkpoints
 *.tsbuildinfo
 sparkmonitor/labextension
-sparkmonitor/static
+sparkmonitor/nbextension
 scalalistener/project/
 scalalistener/target/
 sparkmonitor/*.jar

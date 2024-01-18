@@ -8,7 +8,7 @@ const config = {
         extension: path.join(__dirname, 'entry.js'),
     },
     output: {
-        path: path.join(__dirname, '../../sparkmonitor/static'),
+        path: path.join(__dirname, '../../sparkmonitor/nbextension'),
         filename: '[name].js',
         libraryTarget: 'umd',
         publicPath: '',
