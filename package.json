@@ -42,7 +42,7 @@
     "clean:lib": "rimraf lib tsconfig.tsbuildinfo",
     "clean:lintcache": "rimraf .eslintcache .stylelintcache",
     "clean:labextension": "rimraf sparkmonitor/labextension sparkmonitor/_version.py",
-    "clean:nbextension": "rimraf sparkmonitor/static",
+    "clean:nbextension": "rimraf sparkmonitor/nbextension",
     "clean:scalalistener": "rimraf sparkmonitor/*.jar",
     "clean:all": "jlpm clean:lib && jlpm clean:labextension && jlpm clean:nbextension && jlpm clean:scalalistener && jlpm clean:lintcache",
     "eslint": "jlpm eslint:check --fix",

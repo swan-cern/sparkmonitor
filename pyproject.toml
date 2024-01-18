@@ -55,7 +55,7 @@ build-function = "hatch_jupyter_builder.npm_builder"
 ensured-targets = [
     "sparkmonitor/labextension/static/style.js",
     "sparkmonitor/labextension/package.json",
-    "sparkmonitor/static/extension.js",
+    "sparkmonitor/nbextension/extension.js",
     "sparkmonitor/listener_2.11.jar",
     "sparkmonitor/listener_2.12.jar",
 ]
