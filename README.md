@@ -21,15 +21,15 @@ SparkMonitor is an extension for Jupyter Notebook & Lab that enables the live mo
 
 ## Requirements
 
--   Jupyter Lab 4 OR Jupyter Notebook 4.4.0 or higher
--   pyspark 2 or 3
+- Jupyter Lab 4 OR Jupyter Notebook 4.4.0 or higher
+- pyspark 2 or 3
 
 ## Features
 
--   Automatically displays a live monitoring tool below cells that run Spark jobs in a Jupyter notebook
--   A table of jobs and stages with progressbars
--   A timeline which shows jobs, stages, and tasks
--   A graph showing number of active tasks & executor cores vs time
+- Automatically displays a live monitoring tool below cells that run Spark jobs in a Jupyter notebook
+- A table of jobs and stages with progressbars
+- A timeline which shows jobs, stages, and tasks
+- A graph showing number of active tasks & executor cores vs time
 
 <table>
 <tr>
@@ -100,16 +100,16 @@ sbt +package
 
 ## History
 
--   This project was originally written by krishnan-r as a [Google Summer of Code project](https://github.com/krishnan-r/sparkmonitor) for Jupyter Notebook with the [SWAN](https://swan.web.cern.ch/swan/) Notebook Service team at [CERN](http://home.cern/).
+- This project was originally written by krishnan-r as a [Google Summer of Code project](https://github.com/krishnan-r/sparkmonitor) for Jupyter Notebook with the [SWAN](https://swan.web.cern.ch/swan/) Notebook Service team at [CERN](http://home.cern/).
 
--   Further fixes and improvements were made by the team at CERN and members of the community maintained at [swan-cern/jupyter-extensions/tree/master/SparkMonitor](https://github.com/swan-cern/jupyter-extensions/tree/master/SparkMonitor)
+- Further fixes and improvements were made by the team at CERN and members of the community maintained at [swan-cern/jupyter-extensions/tree/master/SparkMonitor](https://github.com/swan-cern/jupyter-extensions/tree/master/SparkMonitor)
 
--   [Jafer Haider](https://github.com/itsjafer) created the fork [jupyterlab-sparkmonitor](https://github.com/itsjafer/jupyterlab-sparkmonitor) to update the extension to be compatible with JupyterLab as part of his internship at Yelp.
+- [Jafer Haider](https://github.com/itsjafer) created the fork [jupyterlab-sparkmonitor](https://github.com/itsjafer/jupyterlab-sparkmonitor) to update the extension to be compatible with JupyterLab as part of his internship at Yelp.
 
--   This repository merges all the work done above and provides support for Lab & Notebook from a single package.
-
+- This repository merges all the work done above and provides support for Lab & Notebook from a single package.
 
 ## Changelog
+
 This repository is published to pypi as [sparkmonitor](https://pypi.org/project/sparkmonitor/)
 
 - 2.x see the [github releases page](https://github.com/swan-cern/sparkmonitor/releases) of this repository

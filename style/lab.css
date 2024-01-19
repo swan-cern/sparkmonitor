@@ -5,6 +5,8 @@
 @import url('./taskdetails.css');
 @import url('./timeline.css');
 
-.SparkMonitorCellWidget {
-    margin-left: calc(var(--jp-cell-collapser-width) + var(--jp-cell-prompt-width));
+.spark-monitor-cell-widget {
+  margin-left: calc(
+    var(--jp-cell-collapser-width) + var(--jp-cell-prompt-width)
+  );
 }
