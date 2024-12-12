@@ -42,6 +42,12 @@ class ScalaMonitor:
         ipython is the instance of ZMQInteractiveShell
         """
         self.ipython = ipython
+        self.comm = None
+
+        # It is possible that messages were requested to send to frontend using
+        # send() before comm is ready. We'll buffer such messages and send them
+        # right after comm is ready. See target_func for more details.
+        self.buffered_msgs = []
 
     def start(self):
         """Creates the socket thread and returns assigned port"""
@@ -54,7 +60,14 @@ class ScalaMonitor:
 
     def send(self, msg):
         """Send a message to the frontend"""
-        self.comm.send(msg)
+        if self.comm is not None:
+            self.comm.send(msg)
+        else:
+            self.buffered_msgs.append(msg)
+            if len(self.buffered_msgs) > 1000:
+                logger.warn("Buffered too many messages before frontend comm is opened. "
+                            "Discard buffered messages")
+                self.buffered_msgs = []
 
     def handle_comm_message(self, msg):
         """Handle message received from frontend
@@ -78,6 +91,9 @@ class ScalaMonitor:
         def _recv(msg):
             self.handle_comm_message(msg)
         comm.send({'msgtype': 'commopen'})
+        for msg in self.buffered_msgs:
+            self.comm.send(msg)
+        self.buffered_msgs = []
 
 
 class SocketThread(Thread):
@@ -199,9 +215,8 @@ def configure(conf):
     """
     global monitor
     port = monitor.getPort()
-    logger.info('SparkConf Configured, Starting to listen on port:', str(port))
+    logger.info('SparkConf Configured, Starting to listen on port: %s', str(port))
     os.environ['SPARKMONITOR_KERNEL_PORT'] = str(port)
-    logger.info(os.environ['SPARKMONITOR_KERNEL_PORT'])
     spark_scala_version = get_spark_scala_version()
     if "2.11" in spark_scala_version:
         jarpath = os.path.abspath(os.path.dirname(__file__)) + "/listener_2.11.jar"
