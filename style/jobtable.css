@@ -1,9 +1,5 @@
 .pm .tdstageicon {
   display: block;
-  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAQAAABKfvVzAAAAXUlEQVR4AWMAgVGwjkGKNA3/GT4wZDAwkqABDA8zaBKtAQp/MjQwsBGnAQGvMVgTpwEB/zFMZ+AjoAEDPmUIpKGGfwzTGPho5OmfDPUMbKREnAYpSSOdgZGSxDcKADdXTK1stp++AAAAAElFTkSuQmCC');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: 100%;
   width: 15px;
 
   /* display: inline-block; */
@@ -19,18 +15,18 @@
 }
 
 .pm td.stagetableoffset {
-  background-color: #e7e7e7;
+  background-color: var(--jp-layout-color0);
 }
 
 .pm th {
   white-space: nowrap;
   font-size: small;
-  background-color: #eee;
+  background-color: var(--jp-layout-color2);
   border: 0;
 }
 
 .pm td {
-  background-color: white;
+  background-color: var(--jp-layout-color0);
   border: 0;
   font-size: small;
   border-top: 1px solid rgb(84 84 84 / 8%);
@@ -66,7 +62,7 @@
 
 .pm tr .tdstagebutton:hover ~ td,
 tr .tdstagebutton:hover {
-  background-color: rgb(184 223 255 / 37%);
+  background-color: var(--jp-layout-color2);
 }
 
 .pm th.thbutton {
@@ -171,7 +167,7 @@ progress {
 }
 
 .pm .stagetable tr th {
-  background: rgb(235 235 235);
+  background: var(--jp-layout-color2);
 }
 
 .pm .cssprogress {
