@@ -203,8 +203,8 @@ def configure(conf):
     os.environ['SPARKMONITOR_KERNEL_PORT'] = str(port)
     logger.info(os.environ['SPARKMONITOR_KERNEL_PORT'])
     spark_scala_version = get_spark_scala_version()
-    if "2.11" in spark_scala_version:
-        jarpath = os.path.abspath(os.path.dirname(__file__)) + "/listener_2.11.jar"
+    if "2.13" in spark_scala_version:
+        jarpath = os.path.abspath(os.path.dirname(__file__)) + "/listener_2.13.jar"
         logger.info('Adding jar from %s ', jarpath)
         conf.set('spark.driver.extraClassPath', jarpath)
         conf.set('spark.extraListeners', 'sparkmonitor.listener.JupyterSparkMonitorListener')
