@@ -10,7 +10,8 @@ node_modules/
 *.tsbuildinfo
 sparkmonitor/labextension
 sparkmonitor/nbextension
-scalalistener/project/
+scalalistener/project/project
+scalalistener/project/target
 scalalistener/target/
 sparkmonitor/*.jar
 # Version file is handled by hatchling
