@@ -77,7 +77,13 @@ const JobItem = observer((props: { jobId: string }) => {
             className={
               'tdstageicon ' + (!stagesCollapsed ? 'tdstageiconcollapsed' : '')
             }
-          ></span>
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" viewBox="0 0 18 18">
+              <g className="jp-icon0" fill="#616161" shapeRendering="geometricPrecision">
+                <path d="M7.2,5.2L10.9,9l-3.8,3.8V5.2H7.2z"/>
+              </g>
+            </svg>
+          </span>
         </td>
         <td className="tdjobid">{job.jobId}</td>
         <td className="tdjobname">{job.name}</td>
