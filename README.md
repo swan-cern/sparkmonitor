@@ -1,6 +1,6 @@
 # SparkMonitor
 
-An extension for [Jupyter Lab](https://jupyterlab.readthedocs.io/en/stable/) & [Jupyter Notebook](https://jupyter.org/) to monitor Apache Spark (pyspark) from notebooks
+An extension for [Jupyter Lab](https://jupyterlab.readthedocs.io/en/stable/) & [Jupyter Notebook](https://jupyter.org/) to monitor Apache Spark (pyspark) job execution from notebooks.
 
 ## About
 
@@ -21,15 +21,17 @@ SparkMonitor is an extension for Jupyter Notebook & Lab that enables the live mo
 
 ## Requirements
 
-- Jupyter Lab 4 OR Jupyter Notebook 4.4.0 or higher
-- pyspark 2 or 3
+- **JupyterLab 4** or **Jupyter Notebook 4.4.0** or later
+- **PySpark 3.x** or **4.x**
+  - SparkMonitor requires **Spark API mode "Spark Classic"** (default in Spark 3.x and 4.0).
+  - **Not compatible** with [Spark Client (Spark Connect)](https://spark.apache.org/docs/latest/spark-connect-overview.html), which uses the new decoupled client-server architecture.
 
 ## Features
 
-- Automatically displays a live monitoring tool below cells that run Spark jobs in a Jupyter notebook
-- A table of jobs and stages with progressbars
-- A timeline which shows jobs, stages, and tasks
-- A graph showing number of active tasks & executor cores vs time
+- **Live Monitoring:** Automatically displays an interactive monitoring panel below each cell that runs Spark jobs in your Jupyter notebook.
+- **Job and Stage Table:** View a real-time table of Spark jobs and stages, each with progress bars for easy tracking.
+- **Timeline Visualization:** Explore a dynamic timeline showing the execution flow of jobs, stages, and tasks.
+- **Resource Graphs:** Monitor active tasks and executor core usage over time with intuitive graphs.
 
 <table>
 <tr>
@@ -41,7 +43,7 @@ SparkMonitor is an extension for Jupyter Notebook & Lab that enables the live mo
 
 ## Quick Start
 
-### Setting up the extension
+### Installation
 
 ```bash
 pip install sparkmonitor # install the extension
@@ -50,29 +52,34 @@ pip install sparkmonitor # install the extension
 ipython profile create # if it does not exist
 echo "c.InteractiveShellApp.extensions.append('sparkmonitor.kernelextension')" >>  $(ipython profile locate default)/ipython_kernel_config.py
 
-# For use with jupyter notebook install and enable the nbextension
+# When using jupyterlab extension is automatically enabled
+
+# When using older versions of jupyter notebook install and enable the nbextension with:
 jupyter nbextension install sparkmonitor --py
 jupyter nbextension enable  sparkmonitor --py
-
-# The jupyterlab extension is automatically enabled
 ```
 
-With the extension installed, a `SparkConf` object called `conf` will be usable from your notebooks. You can use it as follows:
+### How to use SparkMonitor in your notebook
 
-```python
-from pyspark import SparkContext
-# Start the spark context using the SparkConf object named `conf` the extension created in your kernel.
-sc=SparkContext.getOrCreate(conf=conf)
-```
-
-If you already have your own spark configuration, you will need to set `spark.extraListeners` to `sparkmonitor.listener.JupyterSparkMonitorListener` and `spark.driver.extraClassPath` to the path to the sparkmonitor python package `path/to/package/sparkmonitor/listener_<scala_version>.jar`
+Create your Spark session with the extra configurations to activate the SparkMonitor listener.
+You will need to set `spark.extraListeners` to `sparkmonitor.listener.JupyterSparkMonitorListener` and
+`spark.driver.extraClassPath` to the path to the sparkmonitor python package: `path/to/package/sparkmonitor/listener_<scala_version>.jar`  
+Example:
 
 ```python
 from pyspark.sql import SparkSession
 spark = SparkSession.builder\
         .config('spark.extraListeners', 'sparkmonitor.listener.JupyterSparkMonitorListener')\
-        .config('spark.driver.extraClassPath', 'venv/lib/python3.<X>/site-packages/sparkmonitor/listener_<scala_version>.jar')\
+        .config('spark.driver.extraClassPath', 'venv/lib/python3.12/site-packages/sparkmonitor/listener_2.13.jar')\
         .getOrCreate()
+```
+
+Legacy: with the extension installed, a `SparkConf` object called `conf` will be usable from your notebooks. You can use it as follows:
+
+```python
+from pyspark import SparkContext
+# Start the spark context using the SparkConf object named `conf` the extension created in your kernel.
+sc=SparkContext.getOrCreate(conf=conf)
 ```
 
 ## Development
@@ -100,13 +107,15 @@ sbt +package
 
 ## History
 
-- This project was originally written by krishnan-r as a [Google Summer of Code project](https://github.com/krishnan-r/sparkmonitor) for Jupyter Notebook with the [SWAN](https://swan.web.cern.ch/swan/) Notebook Service team at [CERN](http://home.cern/).
+- The first version of SparkMonitor was written by krishnan-r as a [Google Summer of Code project](https://github.com/krishnan-r/sparkmonitor) with the [SWAN](https://swan.web.cern.ch/swan/) Notebook Service team at [CERN](http://home.cern/).
 
 - Further fixes and improvements were made by the team at CERN and members of the community maintained at [swan-cern/jupyter-extensions/tree/master/SparkMonitor](https://github.com/swan-cern/jupyter-extensions/tree/master/SparkMonitor)
 
-- [Jafer Haider](https://github.com/itsjafer) created the fork [jupyterlab-sparkmonitor](https://github.com/itsjafer/jupyterlab-sparkmonitor) to update the extension to be compatible with JupyterLab as part of his internship at Yelp.
+- [Jafer Haider](https://github.com/itsjafer) worked on updating the extension to be compatible with JupyterLab as part of his internship at Yelp.
 
-- This repository merges all the work done above and provides support for Lab & Notebook from a single package.
+  - Jafer's work at the fork [jupyterlab-sparkmonitor](https://github.com/itsjafer/jupyterlab-sparkmonitor) has since been merged into this repository to provide a single package for both JupyterLab and Jupyter Notebook.
+
+- Further development and maintenance is being done by the SWAN team at CERN and the community.
 
 ## Changelog
 
