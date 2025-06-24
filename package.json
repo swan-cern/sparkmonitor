@@ -1,6 +1,6 @@
 {
     "name": "sparkmonitor",
-    "version": "3.0.4",
+    "version": "3.1.0",
     "description": "Jupyter Notebook & Lab extension to monitor Apache Spark jobs from a notebook",
     "repository": {
         "type": "git",
