@@ -54,18 +54,3 @@ jobs:
       # 9 – Upload to PyPI
       - name: Publish distribution to PyPI 🚀
         uses: pypa/gh-action-pypi-publish@release/v1
-
-      # 10 – Trigger downstream workflow
-      - name: Invoke workflow in systemuser-image
-        uses: benc-uk/workflow-dispatch@v1
-        with:
-          workflow: SWAN CI/CD pipeline
-          ref: master
-          repo: swan-cern/systemuser-image
-          token: ${{ secrets.WORKFLOW_ACCESS_TOKEN }}
-          inputs: |
-            {
-              "package": "sparkmonitor",
-              "version": "${{ env.PACKAGE_VERSION }}"
-            }
-
