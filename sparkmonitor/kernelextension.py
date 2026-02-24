@@ -222,7 +222,15 @@ def sendToFrontEnd(msg):
     global monitor
     monitor.send(msg)
 
+
 def get_spark_scala_version():
-    cmd = "pyspark --version 2>&1 | grep -m 1  -Eo '[0-9]*[.][0-9]*[.][0-9]*[,]' | sed 's/,$//'"
-    version = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding="utf-8")
-    return version.stdout.strip()
+    """Determine the Scala version used by PySpark.
+
+    Spark 4.x uses Scala 2.13, Spark 3.x uses Scala 2.12.
+    """
+    from pyspark import __version__ as spark_version
+    major = int(spark_version.split('.')[0])
+    if major >= 4:
+        return "2.13"
+    else:
+        return "2.12"
