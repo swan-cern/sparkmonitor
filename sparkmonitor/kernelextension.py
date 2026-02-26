@@ -228,9 +228,12 @@ def get_spark_scala_version():
 
     Spark 4.x uses Scala 2.13, Spark 3.x uses Scala 2.12.
     """
-    from pyspark import __version__ as spark_version
-    major = int(spark_version.split('.')[0])
-    if major >= 4:
-        return "2.13"
-    else:
-        return "2.12"
+    import glob
+    spark_home = os.environ.get('SPARK_HOME', '')
+    jars = glob.glob(os.path.join(spark_home, 'jars', 'spark-core_*.jar'))
+    for jar in jars:
+        basename = os.path.basename(jar)
+        # e.g. spark-core_2.12-3.5.6.jar => "2.12"
+        scala_ver = basename.split('_')[1].split('-')[0]
+        return scala_ver
+    return ""
