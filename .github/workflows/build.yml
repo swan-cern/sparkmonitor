@@ -56,7 +56,7 @@ jobs:
       - name: Install the package
         run: pip install .
 
-      # 10 – Install the package
+      # 10 – Install pytest
       - name: Install pytest
         run: pip install pytest
 
