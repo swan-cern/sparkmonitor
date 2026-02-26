@@ -224,7 +224,7 @@ def sendToFrontEnd(msg):
 def get_spark_scala_version():
     """Determine the Scala version used by PySpark.
 
-    Spark 4.x uses Scala 2.13, Spark 3.x uses Scala 2.12.
+    The Scala version is encoded in the spark-core jar filename in SPARK_HOME.
     """
     spark_home = os.environ.get('SPARK_HOME', '')
     for jar in Path(spark_home, 'jars').glob('spark-core_*.jar'):
