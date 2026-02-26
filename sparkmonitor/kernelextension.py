@@ -9,11 +9,8 @@ from __future__ import unicode_literals
 
 import logging
 import os
-import subprocess
 import socket
 from threading import Thread
-
-import pkg_resources
 
 ipykernel_imported = True
 spark_imported = True
