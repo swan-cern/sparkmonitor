@@ -10,6 +10,7 @@ from __future__ import unicode_literals
 import logging
 import os
 import socket
+from pathlib import Path
 from threading import Thread
 
 ipykernel_imported = True
@@ -225,12 +226,10 @@ def get_spark_scala_version():
 
     Spark 4.x uses Scala 2.13, Spark 3.x uses Scala 2.12.
     """
-    import glob
     spark_home = os.environ.get('SPARK_HOME', '')
-    jars = glob.glob(os.path.join(spark_home, 'jars', 'spark-core_*.jar'))
-    for jar in jars:
-        basename = os.path.basename(jar)
-        # e.g. spark-core_2.12-3.5.6.jar => "2.12"
-        scala_ver = basename.split('_')[1].split('-')[0]
+    for jar in Path(spark_home, 'jars').glob('spark-core_*.jar'):
+        # spark-core_2.12-3.5.6.jar => "2.12"
+        # spark-core_2.13-4.1.1.jar => "2.13"
+        scala_ver = jar.name.split('_')[1].split('-')[0]
         return scala_ver
     return ""
