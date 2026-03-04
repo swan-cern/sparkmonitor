@@ -1,4 +1,4 @@
-name: Tests the build of the extension
+name: Build and test the extension
 
 on:
   # Run on any PR that targets the master branch
@@ -52,3 +52,14 @@ jobs:
       - name: Build wheel
         run: python -m build
 
+      # 9 – Install the package
+      - name: Install the package
+        run: pip install .
+
+      # 10 – Install pytest
+      - name: Install pytest
+        run: pip install pytest
+
+      # 11 – Run tests
+      - name: Run tests
+        run: pytest

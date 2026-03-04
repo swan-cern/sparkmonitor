@@ -9,11 +9,9 @@ from __future__ import unicode_literals
 
 import logging
 import os
-import subprocess
 import socket
+from pathlib import Path
 from threading import Thread
-
-import pkg_resources
 
 ipykernel_imported = True
 spark_imported = True
@@ -222,7 +220,16 @@ def sendToFrontEnd(msg):
     global monitor
     monitor.send(msg)
 
+
 def get_spark_scala_version():
-    cmd = "pyspark --version 2>&1 | grep -m 1  -Eo '[0-9]*[.][0-9]*[.][0-9]*[,]' | sed 's/,$//'"
-    version = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding="utf-8")
-    return version.stdout.strip()
+    """Determine the Scala version used by PySpark.
+
+    The Scala version is encoded in the spark-core jar filename in SPARK_HOME.
+    """
+    spark_home = os.environ.get('SPARK_HOME', '')
+    for jar in Path(spark_home, 'jars').glob('spark-core_*.jar'):
+        # spark-core_2.12-3.5.6.jar => "2.12"
+        # spark-core_2.13-4.1.1.jar => "2.13"
+        scala_ver = jar.name.split('_')[1].split('-')[0]
+        return scala_ver
+    return ""
