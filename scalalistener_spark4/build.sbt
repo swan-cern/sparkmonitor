@@ -7,13 +7,13 @@ licenses    += ("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0")
 
 name := "sparkmonitor"
 
-scalaVersion        := "2.13.16"
+scalaVersion        := "2.13.18"
 
 /***************************************
  *   runtime / compile dependencies    *
  ***************************************/
 libraryDependencies ++= Seq(
-  "org.apache.spark" %% "spark-sql"  % "4.0.0" % Provided
+  "org.apache.spark" %% "spark-sql"  % "4.1.1" % Provided
 )
 
 /******************************************
