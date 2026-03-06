@@ -1,126 +1,299 @@
 # SparkMonitor
 
-An extension for [Jupyter Lab](https://jupyterlab.readthedocs.io/en/stable/) & [Jupyter Notebook](https://jupyter.org/) to monitor Apache Spark (pyspark) job execution from notebooks.
+SparkMonitor is a Jupyter extension for monitoring Apache Spark jobs
+launched from notebooks. It displays live Spark metrics directly in the
+notebook interface, making it easier to understand, debug, and profile
+Spark workloads as they run.
+
+It supports **JupyterLab** and **classic Jupyter Notebook** with
+**PySpark 3.x** and **4.x**.
 
 ## About
 
 <table>
-<tr>
-<td><a href="http://jupyter.org/"><img src="https://user-images.githubusercontent.com/6822941/29750386-872556fe-8b5c-11e7-95e1-42b12d709017.png" height="50"/></a></td>
-<td><b>+</b></td>
-<td><a href="https://spark.apache.org/"><img src="https://user-images.githubusercontent.com/6822941/29750352-e9807b36-8b5b-11e7-929a-249f56c7cf79.png" height="80"/></a></td>
-<td><b>=</b></td>
-<td><a href="https://user-images.githubusercontent.com/6822941/29601568-d5e42934-87f9-11e7-9780-3cd3a0d8d86b.png" title="The SparkMonitor Extension."><img src="https://user-images.githubusercontent.com/6822941/29601568-d5e42934-87f9-11e7-9780-3cd3a0d8d86b.png" height="80"/></a></td>
-</tr>
+  <tr>
+    <td>
+      <a href="http://jupyter.org/">
+        <img
+          src="https://user-images.githubusercontent.com/6822941/29750386-872556fe-8b5c-11e7-95e1-42b12d709017.png"
+          height="50"
+          alt="Jupyter"
+        />
+      </a>
+    </td>
+    <td><b>+</b></td>
+    <td>
+      <a href="https://spark.apache.org/">
+        <img
+          src="https://user-images.githubusercontent.com/6822941/29750352-e9807b36-8b5b-11e7-929a-249f56c7cf79.png"
+          height="80"
+          alt="Apache Spark"
+        />
+      </a>
+    </td>
+    <td><b>=</b></td>
+    <td>
+      <a
+        href="https://user-images.githubusercontent.com/6822941/29601568-d5e42934-87f9-11e7-9780-3cd3a0d8d86b.png"
+        title="SparkMonitor Extension"
+      >
+        <img
+          src="https://user-images.githubusercontent.com/6822941/29601568-d5e42934-87f9-11e7-9780-3cd3a0d8d86b.png"
+          height="80"
+          alt="SparkMonitor"
+        />
+      </a>
+    </td>
+  </tr>
 </table>
-SparkMonitor is an extension for Jupyter Notebook & Lab that enables the live monitoring of Apache Spark Jobs spawned from a notebook. The extension provides several features to monitor and debug a Spark job from within the notebook interface. <br>
+
+SparkMonitor adds an interactive monitoring panel below notebook cells
+that trigger Spark jobs, so you can inspect execution progress without
+leaving the notebook.
 
 ---
 
-![jobdisplay](https://user-images.githubusercontent.com/6822941/29753710-ff8849b6-8b94-11e7-8f9c-bdc59bf72143.gif)
+![SparkMonitor job display](https://user-images.githubusercontent.com/6822941/29753710-ff8849b6-8b94-11e7-8f9c-bdc59bf72143.gif)
 
 ## Requirements
 
-- **JupyterLab 4** or **Jupyter Notebook 4.4.0** or later
+- **Python 3**
 - **PySpark 3.x** or **4.x**
-  - SparkMonitor requires **Spark API mode "Spark Classic"** (default in Spark 3.x and 4.0).
-  - **Not compatible** with [Spark Client (Spark Connect)](https://spark.apache.org/docs/latest/spark-connect-overview.html), which uses the new decoupled client-server architecture.
+- **JupyterLab 4** or **Jupyter Notebook 4.4.0** or later
+- **Spark Classic API mode**
+  - SparkMonitor works with the traditional Spark driver model used by
+    PySpark.
+  - It is **not compatible** with
+    [Spark Connect](https://spark.apache.org/docs/latest/spark-connect-overview.html).
 
 ## Features
 
-- **Live Monitoring:** Automatically displays an interactive monitoring panel below each cell that runs Spark jobs in your Jupyter notebook.
-- **Job and Stage Table:** View a real-time table of Spark jobs and stages, each with progress bars for easy tracking.
-- **Timeline Visualization:** Explore a dynamic timeline showing the execution flow of jobs, stages, and tasks.
-- **Resource Graphs:** Monitor active tasks and executor core usage over time with intuitive graphs.
+- **Live monitoring** of Spark jobs launched from a notebook cell
+- **Job and stage table** with progress bars and execution details
+- **Timeline view** showing jobs, stages, and tasks over time
+- **Resource graphs** for active tasks and executor core usage
 
 <table>
-<tr>
-<td><a href="https://user-images.githubusercontent.com/6822941/29601990-d6256a1e-87fb-11e7-94cb-b4418c61d221.png" title="Jobs and stages started from a cell."><img src="https://user-images.githubusercontent.com/6822941/29601990-d6256a1e-87fb-11e7-94cb-b4418c61d221.png"></a></td>
-<td><a href="https://user-images.githubusercontent.com/6822941/29601769-d8e82a26-87fa-11e7-9b0e-91b1414e7821.png" title="A graph of the number of active tasks and available executor cores."><img src="https://user-images.githubusercontent.com/6822941/29601769-d8e82a26-87fa-11e7-9b0e-91b1414e7821.png" ></a></td>
-<td><a href="https://user-images.githubusercontent.com/6822941/29601776-d919dae4-87fa-11e7-8939-a6c0d0072d90.png" title="An event timeline with jobs, stages and tasks across various executors. The tasks are split into various coloured phases, providing insight into the nature of computation."><img src="https://user-images.githubusercontent.com/6822941/29601776-d919dae4-87fa-11e7-8939-a6c0d0072d90.png"></a></td>
-</tr>
+  <tr>
+    <td>
+      <a
+        href="https://user-images.githubusercontent.com/6822941/29601990-d6256a1e-87fb-11e7-94cb-b4418c61d221.png"
+        title="Jobs and stages started from a cell"
+      >
+        <img
+          src="https://user-images.githubusercontent.com/6822941/29601990-d6256a1e-87fb-11e7-94cb-b4418c61d221.png"
+          alt="Jobs and stages view"
+        />
+      </a>
+    </td>
+    <td>
+      <a
+        href="https://user-images.githubusercontent.com/6822941/29601769-d8e82a26-87fa-11e7-9b0e-91b1414e7821.png"
+        title="Graph of active tasks and available executor cores"
+      >
+        <img
+          src="https://user-images.githubusercontent.com/6822941/29601769-d8e82a26-87fa-11e7-9b0e-91b1414e7821.png"
+          alt="Resource graphs"
+        />
+      </a>
+    </td>
+    <td>
+      <a
+        href="https://user-images.githubusercontent.com/6822941/29601776-d919dae4-87fa-11e7-8939-a6c0d0072d90.png"
+        title="Timeline of jobs, stages and tasks"
+      >
+        <img
+          src="https://user-images.githubusercontent.com/6822941/29601776-d919dae4-87fa-11e7-8939-a6c0d0072d90.png"
+          alt="Timeline view"
+        />
+      </a>
+    </td>
+  </tr>
 </table>
 
 ## Quick Start
 
 ### Installation
 
+Create and activate a virtual environment:
+
 ```bash
-pip install sparkmonitor # install the extension
-
-# set up an ipython profile and add our kernel extension to it
-ipython profile create # if it does not exist
-echo "c.InteractiveShellApp.extensions.append('sparkmonitor.kernelextension')" >>  $(ipython profile locate default)/ipython_kernel_config.py
-
-# When using jupyterlab extension is automatically enabled
-
-# When using older versions of jupyter notebook install and enable the nbextension with:
-jupyter nbextension install sparkmonitor --py
-jupyter nbextension enable  sparkmonitor --py
+python -m venv venv
+source venv/bin/activate
 ```
 
-### How to use SparkMonitor in your notebook
+Install SparkMonitor together with PySpark and a notebook frontend.
 
-Create your Spark session with the extra configurations to activate the SparkMonitor listener.
-You will need to set `spark.extraListeners` to `sparkmonitor.listener.JupyterSparkMonitorListener` and
-`spark.driver.extraClassPath` to the path to the sparkmonitor python package: `path/to/package/sparkmonitor/listener_<scala_version>.jar`  
-Example:
+#### For JupyterLab
+
+```bash
+pip install sparkmonitor pyspark jupyterlab
+```
+
+Enable the SparkMonitor IPython kernel extension:
+
+```bash
+ipython profile create
+echo "c.InteractiveShellApp.extensions.append('sparkmonitor.kernelextension')" >> "$(ipython profile locate default)/ipython_kernel_config.py"
+```
+
+This only needs to be done once per IPython profile.
+
+### Using SparkMonitor in a Notebook
+
+To use SparkMonitor, create your Spark session with the SparkMonitor
+listener enabled.
+
+This requires two Spark configurations:
+
+| Configuration                 | Purpose                                                                                                          |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `spark.extraListeners`        | Registers the SparkMonitor listener that collects Spark job metrics                                              |
+| `spark.driver.extraClassPath` | Points to the SparkMonitor listener JAR (`listener_<scala_version>.jar`) bundled with the `sparkmonitor` package |
+
+### Recommended example
+
+The most robust approach is to resolve the listener JAR path
+dynamically from the installed Python package instead of hardcoding the
+full environment path:
+
+```python
+from pathlib import Path
+
+import sparkmonitor
+from pyspark.sql import SparkSession
+
+sparkmonitor_dir = Path(sparkmonitor.__file__).resolve().parent
+listener_jar = sparkmonitor_dir / "listener_2.13.jar"
+
+spark = (
+    SparkSession.builder.config(
+        "spark.extraListeners",
+        "sparkmonitor.listener.JupyterSparkMonitorListener",
+    )
+    .config("spark.driver.extraClassPath", str(listener_jar))
+    .getOrCreate()
+)
+```
+
+### Example with a fixed environment path
+
+If you already know the exact path in your environment, you can also
+configure it directly:
 
 ```python
 from pyspark.sql import SparkSession
-spark = SparkSession.builder\
-        .config('spark.extraListeners', 'sparkmonitor.listener.JupyterSparkMonitorListener')\
-        .config('spark.driver.extraClassPath', 'venv/lib/python3.12/site-packages/sparkmonitor/listener_2.13.jar')\
-        .getOrCreate()
+
+spark = (
+    SparkSession.builder.config(
+        "spark.extraListeners",
+        "sparkmonitor.listener.JupyterSparkMonitorListener",
+    )
+    .config(
+        "spark.driver.extraClassPath",
+        "venv/lib/python3.13/site-packages/sparkmonitor/listener_2.13.jar",
+    )
+    .getOrCreate()
+)
 ```
 
-Legacy: with the extension installed, a `SparkConf` object called `conf` will be usable from your notebooks. You can use it as follows:
+> **Important**
+>
+> The correct listener JAR depends on:
+>
+> - the location of your Python environment
+> - the Scala version used by your Spark installation
+
+You can inspect the installed package location with:
 
 ```python
-from pyspark import SparkContext
-# Start the spark context using the SparkConf object named `conf` the extension created in your kernel.
-sc=SparkContext.getOrCreate(conf=conf)
+import sparkmonitor
+
+print(sparkmonitor.__path__)
 ```
+
+Then locate the corresponding `listener_<scala_version>.jar` file
+inside that package directory.
+
+If needed, you can also build the listener JAR yourself with `sbt`, as
+described in the development section below.
 
 ## Development
 
-If you'd like to develop the extension:
+To work on SparkMonitor locally:
 
 ```bash
-
-# See package.json scripts for building the frontend
-yarn run build:<action>
-
 # Install the package in editable mode
 pip install -e .
 
-# Symlink jupyterlab extension
+# Build the frontend (see package.json for available scripts)
+yarn run build:<action>
+
+# Link the JupyterLab extension into your local Jupyter environment
 jupyter labextension develop --overwrite .
 
-# Watch for frontend changes
+# Watch frontend files for changes
 yarn run watch
 
-# Build the spark JAR files
-sbt +package
-
+# Build the Spark listener JARs
+cd scalalistener_spark4 # Spark 4 / Scala 2.13
+sbt package
 ```
 
-## History
+## Troubleshooting
 
-- The first version of SparkMonitor was written by krishnan-r as a [Google Summer of Code project](https://github.com/krishnan-r/sparkmonitor) with the [SWAN](https://swan.web.cern.ch/swan/) Notebook Service team at [CERN](http://home.cern/).
+### SparkMonitor panel does not appear
 
-- Further fixes and improvements were made by the team at CERN and members of the community maintained at [swan-cern/jupyter-extensions/tree/master/SparkMonitor](https://github.com/swan-cern/jupyter-extensions/tree/master/SparkMonitor)
+Check the following:
 
-- [Jafer Haider](https://github.com/itsjafer) worked on updating the extension to be compatible with JupyterLab as part of his internship at Yelp.
+- `sparkmonitor` is installed in the same Python environment as your
+  notebook kernel
+- `pyspark` is installed
+- `jupyterlab` or `notebook` is installed
+- the IPython kernel extension is enabled
+- your Spark session includes `spark.extraListeners`
+- `spark.driver.extraClassPath` points to a valid listener JAR
+- you are using Spark Classic, not Spark Connect
 
-  - Jafer's work at the fork [jupyterlab-sparkmonitor](https://github.com/itsjafer/jupyterlab-sparkmonitor) has since been merged into this repository to provide a single package for both JupyterLab and Jupyter Notebook.
+### Wrong Scala version
 
-- Further development and maintenance is being done by the SWAN team at CERN and the community.
+The listener JAR must match the Scala version used by your Spark
+installation. For example, if your Spark environment uses Scala 2.13,
+use:
 
-## Changelog
+```text
+listener_2.13.jar
+```
 
-This repository is published to pypi as [sparkmonitor](https://pypi.org/project/sparkmonitor/)
+Using the wrong listener JAR may prevent the listener from loading
+correctly.
 
-- 2.x see the [github releases page](https://github.com/swan-cern/sparkmonitor/releases) of this repository
+### Hardcoded virtual environment path does not work
 
-- 1.x and below were published from [swan-cern/jupyter-extensions](https://github.com/swan-cern/jupyter-extensions) and some initial versions from [krishnan-r/sparkmonitor](https://github.com/krishnan-r/sparkmonitor)
+Avoid hardcoding paths when possible. Environment-specific paths vary
+across systems, Python versions, and virtual environments. The dynamic
+path resolution example above is usually more portable.
+
+## Project History
+
+- The first version of SparkMonitor was written by krishnan-r as a
+  [Google Summer of Code project](https://github.com/krishnan-r/sparkmonitor)
+  with the [SWAN](https://swan.web.cern.ch/swan/) Notebook Service team
+  at [CERN](http://home.cern/).
+- Further fixes and improvements were made by the CERN team and
+  community contributors in
+  [swan-cern/jupyter-extensions/tree/master/SparkMonitor](https://github.com/swan-cern/jupyter-extensions/tree/master/SparkMonitor).
+- [Jafer Haider](https://github.com/itsjafer) updated the extension for
+  JupyterLab during an internship at Yelp.
+- Work from the
+  [jupyterlab-sparkmonitor](https://github.com/itsjafer/jupyterlab-sparkmonitor)
+  fork was later merged into this repository so that both JupyterLab and
+  Jupyter Notebook are supported from a single package.
+- Ongoing maintenance and development continue through the SWAN team at
+  CERN and the community.
+
+## References
+
+- PyPI package: [sparkmonitor](https://pypi.org/project/sparkmonitor/)
+- Releases:
+  [swan-cern/sparkmonitor releases](https://github.com/swan-cern/sparkmonitor/releases)
