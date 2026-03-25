@@ -200,19 +200,14 @@ def configure(conf):
     logger.info('SparkConf Configured, Starting to listen on port:', str(port))
     os.environ['SPARKMONITOR_KERNEL_PORT'] = str(port)
     logger.info(os.environ['SPARKMONITOR_KERNEL_PORT'])
-    spark_scala_version = get_spark_scala_version()
-    if "2.13" in spark_scala_version:
-        jarpath = os.path.abspath(os.path.dirname(__file__)) + "/listener_2.13.jar"
-        logger.info('Adding jar from %s ', jarpath)
-        conf.set('spark.driver.extraClassPath', jarpath)
-        conf.set('spark.extraListeners', 'sparkmonitor.listener.JupyterSparkMonitorListener')
-    elif "2.12" in spark_scala_version:
-        jarpath = os.path.abspath(os.path.dirname(__file__)) + "/listener_2.12.jar"
+    spark_version, spark_scala_version = get_spark_versions()
+    jarpath = get_listener_jar_path(spark_version, spark_scala_version)
+    if jarpath:
         logger.info('Adding jar from %s ', jarpath)
         conf.set('spark.driver.extraClassPath', jarpath)
         conf.set('spark.extraListeners', 'sparkmonitor.listener.JupyterSparkMonitorListener')
     else:
-        logger.warn("Unknown scala version skipped configuring listener jar.")
+        logger.warn("Unknown Spark/Scala version skipped configuring listener jar.")
 
 
 def sendToFrontEnd(msg):
@@ -232,4 +227,32 @@ def get_spark_scala_version():
         # spark-core_2.13-4.1.1.jar => "2.13"
         scala_ver = jar.name.split('_')[1].split('-')[0]
         return scala_ver
+    return ""
+
+
+def get_spark_versions():
+    """Determine Spark major version and Scala version from SPARK_HOME jars.
+
+    Returns a tuple of (spark_major, scala_version), e.g. ("3", "2.13").
+    """
+    spark_home = os.environ.get('SPARK_HOME', '')
+    for jar in Path(spark_home, 'jars').glob('spark-core_*.jar'):
+        # spark-core_2.12-3.5.6.jar => scala="2.12", spark_major="3"
+        # spark-core_2.13-4.1.1.jar => scala="2.13", spark_major="4"
+        name_parts = jar.name.split('_')[1].split('-')
+        scala_ver = name_parts[0]
+        spark_major = name_parts[1].split('.')[0] if len(name_parts) > 1 else ""
+        return spark_major, scala_ver
+    return "", ""
+
+
+def get_listener_jar_path(spark_major, scala_version):
+    """Return listener jar path for the detected Spark/Scala combination."""
+    base_path = os.path.abspath(os.path.dirname(__file__))
+    if spark_major == "3" and scala_version == "2.12":
+        return base_path + "/listener_2.12.jar"
+    if spark_major == "3" and scala_version == "2.13":
+        return base_path + "/listener_spark3_2.13.jar"
+    if spark_major == "4" and scala_version == "2.13":
+        return base_path + "/listener_2.13.jar"
     return ""

@@ -146,35 +146,10 @@ listener enabled.
 
 This requires two Spark configurations:
 
-| Configuration                 | Purpose                                                                                                          |
-| ----------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| `spark.extraListeners`        | Registers the SparkMonitor listener that collects Spark job metrics                                              |
-| `spark.driver.extraClassPath` | Points to the SparkMonitor listener JAR (`listener_<scala_version>.jar`) bundled with the `sparkmonitor` package |
-
-### Recommended example
-
-The most robust approach is to resolve the listener JAR path
-dynamically from the installed Python package instead of hardcoding the
-full environment path:
-
-```python
-from pathlib import Path
-
-import sparkmonitor
-from pyspark.sql import SparkSession
-
-sparkmonitor_dir = Path(sparkmonitor.__file__).resolve().parent
-listener_jar = sparkmonitor_dir / "listener_2.13.jar"
-
-spark = (
-    SparkSession.builder.config(
-        "spark.extraListeners",
-        "sparkmonitor.listener.JupyterSparkMonitorListener",
-    )
-    .config("spark.driver.extraClassPath", str(listener_jar))
-    .getOrCreate()
-)
-```
+| Configuration                 | Purpose                                                                         |
+| ----------------------------- | ------------------------------------------------------------------------------- |
+| `spark.extraListeners`        | Registers the SparkMonitor listener that collects Spark job metrics             |
+| `spark.driver.extraClassPath` | Points to the SparkMonitor listener JAR bundled with the `sparkmonitor` package |
 
 ### Example with a fixed environment path
 
@@ -197,12 +172,55 @@ spark = (
 )
 ```
 
+### Recommended example
+
+The most robust approach is to resolve the listener JAR path
+dynamically from the installed Python package instead of hardcoding the
+full environment path:
+
+```python
+import os
+from pathlib import Path
+
+import sparkmonitor
+from pyspark.sql import SparkSession
+
+
+def resolve_listener_jar(sparkmonitor_dir: Path) -> Path:
+  spark_home = Path(os.environ.get("SPARK_HOME", ""))
+  for jar in (spark_home / "jars").glob("spark-core_*.jar"):
+    # spark-core_2.13-3.5.8.jar => scala=2.13, spark_major=3
+    scala_ver, spark_ver = jar.name.split("_")[1].split("-")[:2]
+    spark_major = spark_ver.split(".")[0]
+    if spark_major == "3" and scala_ver == "2.12":
+      return sparkmonitor_dir / "listener_2.12.jar"
+    if spark_major == "3" and scala_ver == "2.13":
+      return sparkmonitor_dir / "listener_spark3_2.13.jar"
+    if spark_major == "4" and scala_ver == "2.13":
+      return sparkmonitor_dir / "listener_2.13.jar"
+
+  raise RuntimeError("Could not detect Spark/Scala version from SPARK_HOME")
+
+
+sparkmonitor_dir = Path(sparkmonitor.__file__).resolve().parent
+listener_jar = resolve_listener_jar(sparkmonitor_dir)
+
+spark = (
+  SparkSession.builder.config(
+    "spark.extraListeners",
+    "sparkmonitor.listener.JupyterSparkMonitorListener",
+  )
+  .config("spark.driver.extraClassPath", str(listener_jar))
+  .getOrCreate()
+)
+```
+
 > **Important**
 >
 > The correct listener JAR depends on:
 >
 > - the location of your Python environment
-> - the Scala version used by your Spark installation
+> - your Spark major version and Scala version
 
 You can inspect the installed package location with:
 
@@ -212,8 +230,11 @@ import sparkmonitor
 print(sparkmonitor.__path__)
 ```
 
-Then locate the corresponding `listener_<scala_version>.jar` file
-inside that package directory.
+Then locate the corresponding listener JAR in that package directory:
+
+- `listener_2.12.jar` for Spark 3 + Scala 2.12
+- `listener_spark3_2.13.jar` for Spark 3 + Scala 2.13
+- `listener_2.13.jar` for Spark 4 + Scala 2.13
 
 If needed, you can also build the listener JAR yourself with `sbt`, as
 described in the development section below.
@@ -236,7 +257,10 @@ jupyter labextension develop --overwrite .
 yarn run watch
 
 # Build the Spark listener JARs
-cd scalalistener_spark4 # Spark 4 / Scala 2.13
+cd scalalistener_spark3 # Spark 3 / Scala 2.12 and 2.13
+sbt +package
+
+cd ../scalalistener_spark4 # Spark 4 / Scala 2.13
 sbt package
 ```
 
@@ -255,18 +279,18 @@ Check the following:
 - `spark.driver.extraClassPath` points to a valid listener JAR
 - you are using Spark Classic, not Spark Connect
 
-### Wrong Scala version
+### Wrong listener JAR selected
 
-The listener JAR must match the Scala version used by your Spark
-installation. For example, if your Spark environment uses Scala 2.13,
-use:
+The listener JAR must match both your Spark major version and Scala
+version:
 
 ```text
-listener_2.13.jar
+Spark 3 + Scala 2.12 -> listener_2.12.jar
+Spark 3 + Scala 2.13 -> listener_spark3_2.13.jar
+Spark 4 + Scala 2.13 -> listener_2.13.jar
 ```
 
-Using the wrong listener JAR may prevent the listener from loading
-correctly.
+Using the wrong listener JAR may prevent the listener from loading correctly.
 
 ### Hardcoded virtual environment path does not work
 

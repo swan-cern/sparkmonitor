@@ -57,6 +57,7 @@ ensured-targets = [
     "sparkmonitor/labextension/package.json",
     "sparkmonitor/nbextension/extension.js",
     "sparkmonitor/listener_2.13.jar",
+    "sparkmonitor/listener_spark3_2.13.jar",
     "sparkmonitor/listener_2.12.jar",
 ]
 skip-if-exists = ["sparkmonitor/labextension/static/style.js"]
