@@ -57,9 +57,9 @@ leaving the notebook.
 
 ## Requirements
 
-- **Python 3**
+- **Python 3.x**
 - **PySpark 3.x** or **4.x**
-- **JupyterLab 4** or **Jupyter Notebook 4.4.0** or later
+- **JupyterLab 4.x** or **classic Jupyter Notebook 4.4.0 or later**
 - **Spark Classic API mode**
   - SparkMonitor works with the traditional Spark driver model used by
     PySpark.
@@ -151,10 +151,11 @@ This requires two Spark configurations:
 | `spark.extraListeners`        | Registers the SparkMonitor listener that collects Spark job metrics             |
 | `spark.driver.extraClassPath` | Points to the SparkMonitor listener JAR bundled with the `sparkmonitor` package |
 
-### Example with a fixed environment path
+### Example with a manually specified listener JAR path
 
-If you already know the exact path in your environment, you can also
-configure it directly:
+If you already know the exact path to the matching SparkMonitor
+listener JAR in your current environment, you can set
+`spark.driver.extraClassPath` directly:
 
 ```python
 from pyspark.sql import SparkSession
@@ -166,52 +167,69 @@ spark = (
     )
     .config(
         "spark.driver.extraClassPath",
+        # Put the path to the matching SparkMonitor listener JAR here.
         "venv/lib/python3.13/site-packages/sparkmonitor/listener_spark4_2.13.jar",
     )
     .getOrCreate()
 )
 ```
 
-### Recommended example
+### Example with automatic listener JAR detection
 
 The most robust approach is to resolve the listener JAR path
 dynamically from the installed Python package instead of hardcoding the
-full environment path:
+full environment path. The example below first checks `SPARK_HOME` and
+then falls back to the `pyspark` package layout used by
+`pip install pyspark`, where `SPARK_HOME` is often not set:
 
 ```python
 import os
 from pathlib import Path
 
+import pyspark
 import sparkmonitor
 from pyspark.sql import SparkSession
 
 
-def resolve_listener_jar(sparkmonitor_dir: Path) -> Path:
-  spark_home = Path(os.environ.get("SPARK_HOME", ""))
-  for jar in (spark_home / "jars").glob("spark-core_*.jar"):
-    # spark-core_2.13-3.5.8.jar => scala=2.13, spark_major=3
-    scala_ver, spark_ver = jar.name.split("_")[1].split("-")[:2]
-    spark_major = spark_ver.split(".")[0]
-    if spark_major == "3" and scala_ver == "2.12":
-      return sparkmonitor_dir / "listener_spark3_2.12.jar"
-    if spark_major == "3" and scala_ver == "2.13":
-      return sparkmonitor_dir / "listener_spark3_2.13.jar"
-    if spark_major == "4" and scala_ver == "2.13":
-      return sparkmonitor_dir / "listener_spark4_2.13.jar"
+def iter_spark_jar_dirs() -> list[Path]:
+    candidates = []
 
-  raise RuntimeError("Could not detect Spark/Scala version from SPARK_HOME")
+    spark_home = os.environ.get("SPARK_HOME")
+    if spark_home:
+        candidates.append(Path(spark_home) / "jars")
+
+    candidates.append(Path(pyspark.__file__).resolve().parent / "jars")
+    return [path for path in candidates if path.exists()]
+
+
+def resolve_listener_jar(sparkmonitor_dir: Path) -> Path:
+    for jars_dir in iter_spark_jar_dirs():
+        for jar in jars_dir.glob("spark-core_*.jar"):
+            # spark-core_2.13-3.5.8.jar => scala=2.13, spark_major=3
+            scala_ver, spark_ver = jar.name.split("_")[1].split("-")[:2]
+            spark_major = spark_ver.split(".")[0]
+            if spark_major == "3" and scala_ver == "2.12":
+                return sparkmonitor_dir / "listener_spark3_2.12.jar"
+            if spark_major == "3" and scala_ver == "2.13":
+                return sparkmonitor_dir / "listener_spark3_2.13.jar"
+            if spark_major == "4" and scala_ver == "2.13":
+                return sparkmonitor_dir / "listener_spark4_2.13.jar"
+
+    raise RuntimeError(
+        "Could not detect Spark/Scala version from SPARK_HOME or the pyspark installation"
+    )
 
 
 sparkmonitor_dir = Path(sparkmonitor.__file__).resolve().parent
 listener_jar = resolve_listener_jar(sparkmonitor_dir)
 
 spark = (
-  SparkSession.builder.config(
-    "spark.extraListeners",
-    "sparkmonitor.listener.JupyterSparkMonitorListener",
-  )
-  .config("spark.driver.extraClassPath", str(listener_jar))
-  .getOrCreate()
+    SparkSession.builder.config(
+        "spark.extraListeners",
+        "sparkmonitor.listener.JupyterSparkMonitorListener",
+    )
+    .config("spark.driver.extraClassPath", str(listener_jar))
+    .getOrCreate()
 )
 ```
 
@@ -221,6 +239,7 @@ spark = (
 >
 > - the location of your Python environment
 > - your Spark major version and Scala version
+> - how Spark is installed (`SPARK_HOME` vs `pip install pyspark`)
 
 You can inspect the installed package location with:
 
@@ -297,6 +316,13 @@ Using the wrong listener JAR may prevent the listener from loading correctly.
 Avoid hardcoding paths when possible. Environment-specific paths vary
 across systems, Python versions, and virtual environments. The dynamic
 path resolution example above is usually more portable.
+
+### `SPARK_HOME` is not set
+
+This is expected in some setups, especially when Spark comes from
+`pip install pyspark`. In that case, use the `pyspark` package location
+to find the bundled Spark JARs instead of assuming `SPARK_HOME/jars`
+exists.
 
 ## Project History
 
