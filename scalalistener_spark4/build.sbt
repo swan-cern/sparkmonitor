@@ -21,5 +21,5 @@ libraryDependencies ++= Seq(
  ******************************************/
 Compile / packageBin / artifactPath := {
   val bin = CrossVersion.binaryScalaVersion(scalaVersion.value)
-  baseDirectory.value / ".." / "sparkmonitor" / s"listener_$bin.jar"
+  baseDirectory.value / ".." / "sparkmonitor" / s"listener_spark4_$bin.jar"
 }
