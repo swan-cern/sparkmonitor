@@ -216,20 +216,6 @@ def sendToFrontEnd(msg):
     monitor.send(msg)
 
 
-def get_spark_scala_version():
-    """Determine the Scala version used by PySpark.
-
-    The Scala version is encoded in the spark-core jar filename in SPARK_HOME.
-    """
-    spark_home = os.environ.get('SPARK_HOME', '')
-    for jar in Path(spark_home, 'jars').glob('spark-core_*.jar'):
-        # spark-core_2.12-3.5.6.jar => "2.12"
-        # spark-core_2.13-4.1.1.jar => "2.13"
-        scala_ver = jar.name.split('_')[1].split('-')[0]
-        return scala_ver
-    return ""
-
-
 def get_spark_versions():
     """Determine Spark major version and Scala version from SPARK_HOME jars.
 
