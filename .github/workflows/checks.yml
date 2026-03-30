@@ -25,9 +25,9 @@ jobs:
           cache-dependency-path: yarn.lock
           
       - name: Setup Python
-        uses: actions/setup-python@v2.2.2
+        uses: actions/setup-python@v5
         with:
-          python-version: 3.x
+          python-version: '3.13'
       
       - name: Install Jupyterlab
         run: pip install jupyterlab==4
