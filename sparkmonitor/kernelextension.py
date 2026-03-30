@@ -236,9 +236,9 @@ def get_listener_jar_path(spark_major, scala_version):
     """Return listener jar path for the detected Spark/Scala combination."""
     base_path = os.path.abspath(os.path.dirname(__file__))
     if spark_major == "3" and scala_version == "2.12":
-        return base_path + "/listener_2.12.jar"
+        return base_path + "/listener_spark3_2.12.jar"
     if spark_major == "3" and scala_version == "2.13":
         return base_path + "/listener_spark3_2.13.jar"
     if spark_major == "4" and scala_version == "2.13":
-        return base_path + "/listener_2.13.jar"
+        return base_path + "/listener_spark4_2.13.jar"
     return ""

@@ -36,13 +36,13 @@ class TestGetSparkVersions:
 
 class TestGetListenerJarPath:
     def test_spark3_scala_212_uses_212_jar(self):
-        assert get_listener_jar_path("3", "2.12").endswith("/listener_2.12.jar")
+        assert get_listener_jar_path("3", "2.12").endswith("/listener_spark3_2.12.jar")
 
     def test_spark3_scala_213_uses_spark3_jar(self):
         assert get_listener_jar_path("3", "2.13").endswith("/listener_spark3_2.13.jar")
 
     def test_spark4_scala_213_uses_default_213_jar(self):
-        assert get_listener_jar_path("4", "2.13").endswith("/listener_2.13.jar")
+        assert get_listener_jar_path("4", "2.13").endswith("/listener_spark4_2.13.jar")
 
     def test_unknown_spark_major_returns_empty_path(self):
         assert get_listener_jar_path("5", "2.13") == ""

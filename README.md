@@ -166,7 +166,7 @@ spark = (
     )
     .config(
         "spark.driver.extraClassPath",
-        "venv/lib/python3.13/site-packages/sparkmonitor/listener_2.13.jar",
+        "venv/lib/python3.13/site-packages/sparkmonitor/listener_spark4_2.13.jar",
     )
     .getOrCreate()
 )
@@ -193,11 +193,11 @@ def resolve_listener_jar(sparkmonitor_dir: Path) -> Path:
     scala_ver, spark_ver = jar.name.split("_")[1].split("-")[:2]
     spark_major = spark_ver.split(".")[0]
     if spark_major == "3" and scala_ver == "2.12":
-      return sparkmonitor_dir / "listener_2.12.jar"
+      return sparkmonitor_dir / "listener_spark3_2.12.jar"
     if spark_major == "3" and scala_ver == "2.13":
       return sparkmonitor_dir / "listener_spark3_2.13.jar"
     if spark_major == "4" and scala_ver == "2.13":
-      return sparkmonitor_dir / "listener_2.13.jar"
+      return sparkmonitor_dir / "listener_spark4_2.13.jar"
 
   raise RuntimeError("Could not detect Spark/Scala version from SPARK_HOME")
 
@@ -232,9 +232,9 @@ print(sparkmonitor.__path__)
 
 Then locate the corresponding listener JAR in that package directory:
 
-- `listener_2.12.jar` for Spark 3 + Scala 2.12
+- `listener_spark3_2.12.jar` for Spark 3 + Scala 2.12
 - `listener_spark3_2.13.jar` for Spark 3 + Scala 2.13
-- `listener_2.13.jar` for Spark 4 + Scala 2.13
+- `listener_spark4_2.13.jar` for Spark 4 + Scala 2.13
 
 If needed, you can also build the listener JAR yourself with `sbt`, as
 described in the development section below.
@@ -285,9 +285,9 @@ The listener JAR must match both your Spark major version and Scala
 version:
 
 ```text
-Spark 3 + Scala 2.12 -> listener_2.12.jar
+Spark 3 + Scala 2.12 -> listener_spark3_2.12.jar
 Spark 3 + Scala 2.13 -> listener_spark3_2.13.jar
-Spark 4 + Scala 2.13 -> listener_2.13.jar
+Spark 4 + Scala 2.13 -> listener_spark4_2.13.jar
 ```
 
 Using the wrong listener JAR may prevent the listener from loading correctly.
