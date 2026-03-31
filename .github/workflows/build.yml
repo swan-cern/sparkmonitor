@@ -11,7 +11,7 @@ jobs:
 
     steps:
       # 1 – Check out the code
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       # 2 – Expose the version tag as $PACKAGE_VERSION (only if this is a v* tag ref)
       - name: Set environment package version from tag
