@@ -29,6 +29,9 @@
         "url": "https://github.com/swan-cern/sparkmonitor/issues"
     },
     "homepage": "https://github.com/swan-cern/sparkmonitor",
+    "engines": {
+        "node": ">=24 <25"
+    },
     "scripts": {
         "build": "jlpm run build:lib && jlpm run build:labextension:dev",
         "build:prod": "jlpm clean && jlpm run build:lib:prod && jlpm run build:labextension && jlpm run build:nbextension && jlpm run build:scalalistener",
