@@ -28,10 +28,12 @@ jobs:
       - name: Install release tooling
         run: python -m pip install bump2version
       - name: Bump and tag
+        env:
+          BUMP: ${{ github.event.inputs.bump }}
         run: |
           git config --local user.email "swan-admins@cern.ch"
           git config --local user.name "swan-admins[bot]"
-          bump2version ${{ github.event.inputs.bump }}
+          bump2version ${BUMP}
       - name: Push changes
         uses: ad-m/github-push-action@4cc74773234f74829a8c21bc4d69dd4be9cfa599 # v1.1.0
         with:
