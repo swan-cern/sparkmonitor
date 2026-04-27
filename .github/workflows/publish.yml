@@ -5,6 +5,10 @@ on:
     tags:
       - 'v*'  # runs only when you push tags like v1.2.3
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions: {}  # Deny all permissions by default at workflow level
 
 jobs:

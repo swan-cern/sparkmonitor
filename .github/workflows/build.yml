@@ -5,6 +5,10 @@ on:
     branches: [ master ]
   workflow_dispatch:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions: {}  # Deny all permissions by default at workflow level
 
 jobs:
