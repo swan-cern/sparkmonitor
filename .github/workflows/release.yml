@@ -8,6 +8,8 @@ on:
         required: true
         default: "patch"
 
+permissions: {}  # Deny all permissions by default at workflow level
+
 jobs:
   bump-version:
     runs-on: ubuntu-latest

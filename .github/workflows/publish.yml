@@ -5,6 +5,8 @@ on:
     tags:
       - 'v*'  # runs only when you push tags like v1.2.3
 
+permissions: {}  # Deny all permissions by default at workflow level
+
 jobs:
   build-publish:
     runs-on: ubuntu-latest
