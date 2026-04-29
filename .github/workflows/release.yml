@@ -35,7 +35,8 @@ jobs:
           git config --local user.name "swan-admins[bot]"
           bump2version ${BUMP}
       - name: Push changes
-        uses: ad-m/github-push-action@4cc74773234f74829a8c21bc4d69dd4be9cfa599 # v1.1.0
-        with:
-          github_token: ${{ secrets.WORKFLOW_ACCESS_TOKEN }}
-          tags: true
+        env:
+          WORKFLOW_ACCESS_TOKEN: ${{ secrets.WORKFLOW_ACCESS_TOKEN }}
+        run: |
+          git remote set-url origin "https://x-access-token:${WORKFLOW_ACCESS_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git push origin "${{ github.ref_name }}"
