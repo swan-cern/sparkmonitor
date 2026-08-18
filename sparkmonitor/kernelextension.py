@@ -11,7 +11,7 @@ import logging
 import os
 import socket
 from pathlib import Path
-from threading import Thread
+from threading import Lock, Thread
 
 ipykernel_imported = True
 spark_imported = True
@@ -40,6 +40,9 @@ class ScalaMonitor:
         ipython is the instance of ZMQInteractiveShell
         """
         self.ipython = ipython
+        self.comm = None
+        self.comm_lock = Lock()
+        self.pending = []
 
     def start(self):
         """Creates the socket thread and returns assigned port"""
@@ -51,8 +54,16 @@ class ScalaMonitor:
         return self.scalaSocket.port
 
     def send(self, msg):
-        """Send a message to the frontend"""
-        self.comm.send(msg)
+        """Send a message to the frontend, buffering until the comm opens.
+
+        May be called from any thread; sends and buffer access are
+        serialized with the buffer flush in target_func.
+        """
+        with self.comm_lock:
+            if self.comm is None:
+                self.pending.append(msg)
+            else:
+                self.comm.send(msg)
 
     def handle_comm_message(self, msg):
         """Handle message received from frontend
@@ -70,12 +81,19 @@ class ScalaMonitor:
     def target_func(self, comm, msg):
         """Callback function to be called when a frontend comm is opened"""
         logger.info('SparkMonitor comm opened from frontend.')
-        self.comm = comm
 
-        @self.comm.on_msg
+        @comm.on_msg
         def _recv(msg):
             self.handle_comm_message(msg)
         comm.send({'msgtype': 'commopen'})
+        # flush buffered messages and only then publish the comm, so direct
+        # sends cannot overtake the flush or reach a frontend that has not
+        # received commopen yet
+        with self.comm_lock:
+            for pending_msg in self.pending:
+                comm.send(pending_msg)
+            self.pending = []
+            self.comm = comm
 
 
 class SocketThread(Thread):
