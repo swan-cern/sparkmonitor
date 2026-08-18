@@ -1,5 +1,9 @@
+import logging
+from threading import Thread
+
 import pytest
 
+from sparkmonitor import kernelextension
 from sparkmonitor.kernelextension import (
     get_listener_jar_path,
     get_spark_versions,
@@ -49,3 +53,72 @@ class TestGetListenerJarPath:
 
     def test_unknown_scala_version_returns_empty_path(self):
         assert get_listener_jar_path("3", "2.11") == ""
+
+
+class FakeComm:
+    """Records messages sent to the frontend."""
+
+    def __init__(self):
+        self.sent = []
+
+    def send(self, msg):
+        self.sent.append(msg)
+
+    def on_msg(self, callback):
+        return callback
+
+
+@pytest.fixture
+def monitor(monkeypatch):
+    monkeypatch.setattr(kernelextension, "logger", logging.getLogger("test"), raising=False)
+    return kernelextension.ScalaMonitor(ipython=None)
+
+
+class TestScalaMonitorComm:
+    def test_send_before_comm_opens_is_buffered(self, monitor):
+        monitor.send({"msgtype": "early"})
+        assert monitor.pending == [{"msgtype": "early"}]
+
+    def test_commopen_is_sent_before_buffered_messages(self, monitor):
+        monitor.send({"msgtype": "early"})
+        comm = FakeComm()
+        monitor.target_func(comm, msg=None)
+        assert comm.sent == [{"msgtype": "commopen"}, {"msgtype": "early"}]
+
+    def test_buffer_is_emptied_after_flush(self, monitor):
+        monitor.send({"msgtype": "early"})
+        monitor.target_func(FakeComm(), msg=None)
+        assert monitor.pending == []
+
+    def test_send_after_comm_opens_goes_directly_to_the_comm(self, monitor):
+        comm = FakeComm()
+        monitor.target_func(comm, msg=None)
+        monitor.send({"msgtype": "late"})
+        assert comm.sent == [{"msgtype": "commopen"}, {"msgtype": "late"}]
+
+    def test_send_during_flush_is_delivered_after_buffered_messages(self, monitor):
+        """A message arriving while the buffer is being flushed must wait for
+        the flush and be delivered afterwards, not lost or reordered."""
+        monitor.send({"msgtype": "early"})
+
+        senders = []
+
+        class CommOpenedDuringSend(FakeComm):
+            def send(self, msg):
+                super().send(msg)
+                if msg == {"msgtype": "early"}:
+                    # a concurrent send during the flush blocks until the
+                    # flush completes because target_func holds the lock
+                    sender = Thread(target=monitor.send, args=({"msgtype": "during-flush"},))
+                    sender.start()
+                    senders.append(sender)
+
+        comm = CommOpenedDuringSend()
+        monitor.target_func(comm, msg=None)
+        for sender in senders:
+            sender.join(timeout=10)
+        assert comm.sent == [
+            {"msgtype": "commopen"},
+            {"msgtype": "early"},
+            {"msgtype": "during-flush"},
+        ]
