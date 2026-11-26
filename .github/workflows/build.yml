@@ -58,9 +58,9 @@ jobs:
         with:
           sbt-runner-version: '1.12.4'
 
-      # 7 – Install Python build / publish deps
+      # 7 – Install Python build deps
       - name: Install Python dependencies
-        run: python -m pip install --upgrade pip build twine
+        run: python -m pip install --upgrade pip build
 
       # 8 – Build the wheel
       - name: Build wheel
